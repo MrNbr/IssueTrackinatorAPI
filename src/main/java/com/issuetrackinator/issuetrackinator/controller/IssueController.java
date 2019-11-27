@@ -35,6 +35,7 @@ public class IssueController
     @Autowired
     UserRepository userRepository;
 
+    // Cas base Get
     @GetMapping
     List<Issue> getAllIssues()
     {
@@ -53,6 +54,7 @@ public class IssueController
             "Couldn't find issue with the specified id");
     }
 
+    // Cas base Post
     @PostMapping
     Issue createNewIssue(@Valid @RequestBody IssueDto issueDto)
     {
