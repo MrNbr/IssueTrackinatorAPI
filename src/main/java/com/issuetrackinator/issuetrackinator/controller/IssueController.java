@@ -20,8 +20,10 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import com.issuetrackinator.issuetrackinator.model.Issue;
 import com.issuetrackinator.issuetrackinator.model.IssueDto;
+import com.issuetrackinator.issuetrackinator.model.Watcher;
 import com.issuetrackinator.issuetrackinator.repository.IssueRepository;
 import com.issuetrackinator.issuetrackinator.repository.UserRepository;
+import com.issuetrackinator.issuetrackinator.repository.WatcherRepository;
 
 @RestController
 @RequestMapping("/api" + IssueController.ISSUE_PATH)
@@ -34,6 +36,9 @@ public class IssueController
 
     @Autowired
     UserRepository userRepository;
+    
+    @Autowired
+    WatcherRepository watcherRepository;
 
     // Cas base Get
     @GetMapping
@@ -113,5 +118,58 @@ public class IssueController
         throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
             "Couldn't find issue with the specified id");
     }
+    
+    @PostMapping("/{id}/watch")
+    Issue watchIssue(@PathVariable Long id)
+    {
+        Optional<Issue> issueOpt = issueRepository.findById(id);
+        Optional<Watcher> watcherOpt = watcherRepository.findById(000);
+        
+        if (!issueOpt.isPresent()) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            "Couldn't find issue with the specified id");
+        }
+        
+        Issue issue = issueOpt.get();
+        Long issue_id = issue.getId();
+        
+        if (!watcherOpt.isPresent()){
+            Watcher watcher = new Watcher(000);
+            watcherRepository.save(watcher);
+            
+            watcherOpt = watcherRepository.findById(000);
+            
+        } else if (watcherOpt.get().isWatching(issue_id)) {
+            throw new HttpClientErrorException(HttpStatus.NOT_ACCEPTABLE,
+            "Already watching this issue.");
+        }
+        
+        Watcher watcher = watcherOpt.get();
+        watcher.addWatcher(id);
+        return issue;
+    }
 
+    @DeleteMapping("/{id}/watch")
+    Issue unwatchIssue(@PathVariable Long id)
+    {
+        Optional<Issue> issueOpt = issueRepository.findById(id);
+        Optional<Watcher> watcherOpt = watcherRepository.findById(000);
+        
+        if (!issueOpt.isPresent()) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            "Couldn't find issue with the specified id");
+        }
+        
+        Issue issue = issueOpt.get();
+        Long issue_id = issue.getId();
+        
+        if (!watcherOpt.isPresent() || !watcherOpt.get().isWatching(id)){
+            throw new HttpClientErrorException(HttpStatus.NOT_ACCEPTABLE,
+            "Cannot unwatch this issue due to is not even watched");
+        }
+        
+        Watcher watcher = watcherOpt.get();
+        watcher.removeWatcher(id);
+        return issue;
+    }
 }
