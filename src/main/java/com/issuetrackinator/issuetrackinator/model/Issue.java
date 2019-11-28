@@ -36,14 +36,14 @@ public class Issue
 
     private String description;
 
-    @NotBlank
-    private String status;
+    @NotNull
+    private IssueStatus status;
 
-    @NotBlank
-    private String type;
+    @NotNull
+    private IssueType type;
 
-    @NotBlank
-    private String priority;
+    @NotNull
+    private IssuePriority priority;
 
     private int votes;
 
@@ -103,36 +103,6 @@ public class Issue
         this.description = description;
     }
 
-    public String getStatus()
-    {
-        return status;
-    }
-
-    public void setStatus(String status)
-    {
-        this.status = status;
-    }
-
-    public String getType()
-    {
-        return type;
-    }
-
-    public void setType(String type)
-    {
-        this.type = type;
-    }
-
-    public String getPriority()
-    {
-        return priority;
-    }
-
-    public void setPriority(String priority)
-    {
-        this.priority = priority;
-    }
-
     public int getVotes()
     {
         return votes;
@@ -161,6 +131,36 @@ public class Issue
     public void setUpdateDate(Date updateDate)
     {
         this.updateDate = updateDate;
+    }
+
+    public IssueStatus getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(IssueStatus status)
+    {
+        this.status = status;
+    }
+
+    public IssueType getType()
+    {
+        return type;
+    }
+
+    public void setType(IssueType type)
+    {
+        this.type = type;
+    }
+
+    public IssuePriority getPriority()
+    {
+        return priority;
+    }
+
+    public void setPriority(IssuePriority priority)
+    {
+        this.priority = priority;
     }
 
 }

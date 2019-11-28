@@ -93,7 +93,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"title\" : \"First issue\",\n\t\"userCreator\" : 1,\n\t\"userAssignee\" : 1,\n\t\"status\" : \"NEW\",\n\t\"type\" : \"BUG\",\n\t\"priority\" : \"CRITICAL\"\n}",
+					"raw": "{\n\t\"title\" : \"First issue\",\n\t\"userCreator\" : 1,\n\t\"userAssignee\" : 1,\n\t\"type\" : \"BUG\",\n\t\"priority\" : \"MAJOR\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
