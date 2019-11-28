@@ -11,11 +11,9 @@ public class IssueDto
 
     private String description;
 
-    private String status;
+    private IssueType type;
 
-    private String type;
-
-    private String priority;
+    private IssuePriority priority;
 
     public Long getUserCreator()
     {
@@ -57,32 +55,22 @@ public class IssueDto
         this.description = description;
     }
 
-    public String getStatus()
-    {
-        return status;
-    }
-
-    public void setStatus(String status)
-    {
-        this.status = status;
-    }
-
-    public String getType()
+    public IssueType getType()
     {
         return type;
     }
 
-    public void setType(String type)
+    public void setType(IssueType type)
     {
         this.type = type;
     }
 
-    public String getPriority()
+    public IssuePriority getPriority()
     {
         return priority;
     }
 
-    public void setPriority(String priority)
+    public void setPriority(IssuePriority priority)
     {
         this.priority = priority;
     }

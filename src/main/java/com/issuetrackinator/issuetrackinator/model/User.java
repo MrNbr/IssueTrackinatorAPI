@@ -1,12 +1,16 @@
 package com.issuetrackinator.issuetrackinator.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
+@JsonIgnoreProperties("hibernateLazyInitializer")
 public class User
 {
     @Id
@@ -14,11 +18,13 @@ public class User
     private Long id;
 
     @NotBlank
+    @Column(unique = true)
     private String username;
 
     private String personalName;
 
     @NotBlank
+    @Column(unique = true)
     private String email;
 
     @NotBlank
