@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.issuetrackinator.issuetrackinator.model.Issue;
 import com.issuetrackinator.issuetrackinator.model.IssueDto;
 import com.issuetrackinator.issuetrackinator.repository.IssueRepository;
@@ -25,6 +26,7 @@ import com.issuetrackinator.issuetrackinator.repository.UserRepository;
 
 @RestController
 @RequestMapping("/api" + IssueController.ISSUE_PATH)
+@JsonIgnoreProperties("hibernateLazyInitializer")
 public class IssueController
 {
     final static String ISSUE_PATH = "/issues";
