@@ -8,11 +8,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
+@JsonIgnoreProperties("hibernateLazyInitializer")
 public class Issue
 {
 
@@ -20,12 +23,12 @@ public class Issue
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "idUserCreator")
     private User userCreator;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "idUserAsignee")
     private User userAssignee;
 
     @NotBlank
@@ -33,14 +36,14 @@ public class Issue
 
     private String description;
 
-    @NotBlank
-    private String status;
+    @NotNull
+    private IssueStatus status;
 
-    @NotBlank
-    private String type;
+    @NotNull
+    private IssueType type;
 
-    @NotBlank
-    private String priority;
+    @NotNull
+    private IssuePriority priority;
 
     private int votes;
 
@@ -100,36 +103,6 @@ public class Issue
         this.description = description;
     }
 
-    public String getStatus()
-    {
-        return status;
-    }
-
-    public void setStatus(String status)
-    {
-        this.status = status;
-    }
-
-    public String getType()
-    {
-        return type;
-    }
-
-    public void setType(String type)
-    {
-        this.type = type;
-    }
-
-    public String getPriority()
-    {
-        return priority;
-    }
-
-    public void setPriority(String priority)
-    {
-        this.priority = priority;
-    }
-
     public int getVotes()
     {
         return votes;
@@ -158,6 +131,36 @@ public class Issue
     public void setUpdateDate(Date updateDate)
     {
         this.updateDate = updateDate;
+    }
+
+    public IssueStatus getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(IssueStatus status)
+    {
+        this.status = status;
+    }
+
+    public IssueType getType()
+    {
+        return type;
+    }
+
+    public void setType(IssueType type)
+    {
+        this.type = type;
+    }
+
+    public IssuePriority getPriority()
+    {
+        return priority;
+    }
+
+    public void setPriority(IssuePriority priority)
+    {
+        this.priority = priority;
     }
 
 }

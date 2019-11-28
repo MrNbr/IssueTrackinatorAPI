@@ -18,13 +18,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.issuetrackinator.issuetrackinator.model.Issue;
 import com.issuetrackinator.issuetrackinator.model.IssueDto;
+import com.issuetrackinator.issuetrackinator.model.IssueStatus;
 import com.issuetrackinator.issuetrackinator.repository.IssueRepository;
 import com.issuetrackinator.issuetrackinator.repository.UserRepository;
 
 @RestController
 @RequestMapping("/api" + IssueController.ISSUE_PATH)
+@JsonIgnoreProperties("hibernateLazyInitializer")
 public class IssueController
 {
     final static String ISSUE_PATH = "/issues";
@@ -66,7 +69,7 @@ public class IssueController
         issue.setVotes(0);
         issue.setDescription(issueDto.getDescription());
         issue.setPriority(issueDto.getPriority());
-        issue.setStatus(issueDto.getStatus());
+        issue.setStatus(IssueStatus.NEW);
         issue.setTitle(issueDto.getTitle());
         issue.setType(issueDto.getType());
         issue.setUserCreator(userRepository.findById(issueDto.getUserCreator()).get());
