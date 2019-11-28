@@ -42,9 +42,25 @@ public class IssueController
 
     // Cas base Get
     @GetMapping
-    List<Issue> getAllIssues()
+    List<Issue> getAllIssues(@RequestParam(required = false, defaultValue = "all", value="filter") String filter,
+                             @RequestParam(required = false, defaultValue = "id", value="sort") String sort,
+                             @RequestParam(required = false, defaultValue = "DESC", value="order") String order,
+                             @RequestParam(required = false, defaultValue = "id", value="value") String value,
+                             @RequestParam(required = false, defaultValue = "0", value="page") String page))
     {
-        return issueRepository.findAll();
+        List<Issue> select = issueRepository.findAll();
+        switch(filter){
+            case "open":
+                break;
+            case "watching":
+                break;
+            case "mine":
+                break;
+            default: // case "all":
+        }
+        
+        
+        return select;
     }
 
     @GetMapping("/{id}")
@@ -120,45 +136,64 @@ public class IssueController
     }
     
     @PostMapping("/{id}/watch")
-    Issue watchIssue(@PathVariable Long id)
+    Issue watchIssue(@PathVariable Long id, @RequestHeader(value="api_key", defaultValue="-1") String api_key)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
-        Optional<Watcher> watcherOpt = watcherRepository.findById(000);
         
         if (!issueOpt.isPresent()) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
             "Couldn't find issue with the specified id");
         }
         
-        Issue issue = issueOpt.get();
-        Long issue_id = issue.getId();
+        Optional<User> userOpt = userRepository.findByToken(api_key);
+        
+        if (!userOpt.isPresent()) {
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED,
+            "Action not available");
+        }
+        
+        User user = userOpt.get();
+        Optional<Watcher> watcherOpt = watcherRepository.findById(user.getId());
         
         if (!watcherOpt.isPresent()){
-            Watcher watcher = new Watcher(000);
+            Watcher watcher = new Watcher(user.getId());
             watcherRepository.save(watcher);
             
-            watcherOpt = watcherRepository.findById(000);
+            watcherOpt = watcherRepository.findById(user.getId());
             
-        } else if (watcherOpt.get().isWatching(issue_id)) {
+        }
+        
+        Watcher watcher = watcherOpt.get();
+        if (watcherOpt.get().isWatching(id)) {
             throw new HttpClientErrorException(HttpStatus.NOT_ACCEPTABLE,
             "Already watching this issue.");
         }
         
-        Watcher watcher = watcherOpt.get();
         watcher.addWatcher(id);
+        watcherRepository.save(watcher);
+        
         return issue;
     }
 
     @DeleteMapping("/{id}/watch")
-    Issue unwatchIssue(@PathVariable Long id)
+    Issue unwatchIssue(@PathVariable Long id, @RequestHeader(value="api_key", defaultValue="-1") String api_key)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
-        Optional<Watcher> watcherOpt = watcherRepository.findById(000);
         
         if (!issueOpt.isPresent()) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
             "Couldn't find issue with the specified id");
         }
+        
+        Optional<User> userOpt = userRepository.findByToken(api_key);
+        
+        if (!userOpt.isPresent()) {
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED,
+            "Action not available");
+        }
+        
+        User user = userOpt.get();
+        Optional<Watcher> watcherOpt = watcherRepository.findById(user.getId());
         
         Issue issue = issueOpt.get();
         Long issue_id = issue.getId();
@@ -170,6 +205,8 @@ public class IssueController
         
         Watcher watcher = watcherOpt.get();
         watcher.removeWatcher(id);
+        watcherRepository.save(watcher);
+        
         return issue;
     }
 }
