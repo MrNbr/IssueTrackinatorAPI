@@ -1,8 +1,10 @@
 package com.issuetrackinator.issuetrackinator.model;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -12,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -39,6 +42,10 @@ public class Issue
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "votes", joinColumns = @JoinColumn(name = "issueId"), inverseJoinColumns = @JoinColumn(name = "userId"))
     Set<User> votesUsers;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "comments", joinColumns = @JoinColumn(name = "issueId"), inverseJoinColumns = @JoinColumn(name = "commentId"))
+    List<Comment> comments;
 
     @NotBlank
     private String title;
@@ -180,6 +187,16 @@ public class Issue
     public void setVotesUsers(Set<User> votesUsers)
     {
         this.votesUsers = votesUsers;
+    }
+
+    public List<Comment> getComments()
+    {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments)
+    {
+        this.comments = comments;
     }
 
 }

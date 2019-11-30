@@ -89,6 +89,11 @@
 						"name": "Content-Type",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "api_key",
+						"value": "0a736350cfdc9de02eee0490f7e0b08e868f21c26f92056e6f3332a831172fe1",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -118,7 +123,13 @@
 			"name": "GET ISSUES",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "api_key",
+						"value": "0a736350cfdc9de02eee0490f7e0b08e868f21c26f92056e6f3332a831172fe1",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "localhost:8080/api/issues",
 					"host": [
@@ -128,6 +139,42 @@
 					"path": [
 						"api",
 						"issues"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "EDIT ISSUE",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"title\" : \"First issue\"\n\t\"userAssignee\" : 1,\n\t\"type\" : \"BUG\",\n\t\"priority\" : \"MAJOR\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/issues/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"issues",
+						"1"
 					]
 				}
 			},
@@ -202,6 +249,194 @@
 						"issues",
 						"1",
 						"vote"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE COMMENT",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "api_key",
+						"value": "0a736350cfdc9de02eee0490f7e0b08e868f21c26f92056e6f3332a831172fe1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"text\" : \"Soy un comentario\",\n\t\"idUser\" : 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/issues/1/comments",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"issues",
+						"1",
+						"comments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "EDIT COMMENT",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "api_key",
+						"value": "0a736350cfdc9de02eee0490f7e0b08e868f21c26f92056e6f3332a831172fe1",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"text\" : \"nuevo comentario editado otra vez como me gusta editar\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/issues/1/comments/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"issues",
+						"1",
+						"comments",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE COMMENT",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "api_key",
+						"value": "0a736350cfdc9de02eee0490f7e0b08e868f21c26f92056e6f3332a831172fe1",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/issues/1/comments/2",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"issues",
+						"1",
+						"comments",
+						"2"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET COMMENTS",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "api_key",
+						"value": "0a736350cfdc9de02eee0490f7e0b08e868f21c26f92056e6f3332a831172fe1",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/issues/1/comments",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"issues",
+						"1",
+						"comments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "EDIT STATUS",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "api_key",
+						"value": "0a736350cfdc9de02eee0490f7e0b08e868f21c26f92056e6f3332a831172fe1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "RESOLVED",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/issues/1/status",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"issues",
+						"1",
+						"status"
 					]
 				}
 			},
