@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.validation.Valid;
 
@@ -23,6 +24,7 @@ import com.issuetrackinator.issuetrackinator.model.Issue;
 import com.issuetrackinator.issuetrackinator.model.IssueDto;
 import com.issuetrackinator.issuetrackinator.model.Watcher;
 import com.issuetrackinator.issuetrackinator.model.IssueStatus;
+import com.issuetrackinator.issuetrackinator.model.User;
 import com.issuetrackinator.issuetrackinator.repository.IssueRepository;
 import com.issuetrackinator.issuetrackinator.repository.UserRepository;
 import com.issuetrackinator.issuetrackinator.repository.WatcherRepository;
@@ -122,7 +124,16 @@ public class IssueController
         if (issueOpt.isPresent())
         {
             Issue issue = issueOpt.get();
-            issue.setVotes(issue.getVotes() + 1);
+            Set<User> votes = issue.getVotesUsers();
+            User user = userRepository.findAll().get(0); // Here find the user with token
+            if (votes.contains(user))
+            {
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                    "User already voted this issue");
+            }
+            votes.add(user);
+            issue.setVotesUsers(votes);
+            issue.setVotes(votes.size());
             issueRepository.save(issue);
             return issue;
         }
@@ -137,7 +148,16 @@ public class IssueController
         if (issueOpt.isPresent())
         {
             Issue issue = issueOpt.get();
-            issue.setVotes(issue.getVotes() - 1);
+            Set<User> votes = issue.getVotesUsers();
+            User user = userRepository.findAll().get(0); // Here find the user with token
+            if (!votes.contains(user))
+            {
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                    "User didn't vote this issue");
+            }
+            votes.remove(user);
+            issue.setVotesUsers(votes);
+            issue.setVotes(votes.size());
             issueRepository.save(issue);
             return issue;
         }

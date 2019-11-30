@@ -76,6 +76,9 @@ public class UserController
         }
         user.setPassword(
             Hashing.sha256().hashString(user.getPassword(), StandardCharsets.UTF_8).toString());
+        user.setToken(
+            Hashing.sha256().hashString(user.getUsername() + user.getEmail() + user.getPassword(),
+                StandardCharsets.UTF_8).toString());
         return userRepository.save(user);
     }
 
