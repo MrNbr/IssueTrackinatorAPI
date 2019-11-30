@@ -26,6 +26,8 @@ import com.issuetrackinator.issuetrackinator.model.IssueStatus;
 import com.issuetrackinator.issuetrackinator.repository.IssueRepository;
 import com.issuetrackinator.issuetrackinator.repository.UserRepository;
 import com.issuetrackinator.issuetrackinator.repository.WatcherRepository;
+import com.issuetrackinator.issuetrackinator.model.IssueDefaultFilter;
+import com.issuetrackinator.issuetrackinator.model.IssueLogedFilter;
 
 @RestController
 @RequestMapping("/api" + IssueController.ISSUE_PATH)
@@ -49,9 +51,14 @@ public class IssueController
                              @RequestParam(required = false, defaultValue = "id", value="sort") String sort,
                              @RequestParam(required = false, defaultValue = "DESC", value="order") String order,
                              @RequestParam(required = false, defaultValue = "id", value="value") String value,
-                             @RequestParam(required = false, defaultValue = "0", value="page") String page))
+                             @RequestParam(required = false, defaultValue = "0", value="page") String page),
+                             @RequestHeader(value="api_key", defaultValue="-1")
     {
         List<Issue> select = issueRepository.findAll();
+        Optional<User> userOpt = userRepository.findByToken(api_key);
+        enum filters = userOpt.isPresent()? IssueLogedFilter : IssueDefaultFilter;
+        
+        
         switch(filter){
             case "open":
                 break;
