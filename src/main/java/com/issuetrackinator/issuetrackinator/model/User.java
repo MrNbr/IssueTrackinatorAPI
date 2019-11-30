@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
@@ -26,6 +27,11 @@ public class User
     @NotBlank
     @Column(unique = true)
     private String email;
+    
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "watchers", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "issueId"))
+    Set<Issue> watchingIssues;
 
     @NotBlank
     private String password;
@@ -90,6 +96,16 @@ public class User
     public void setToken(String token)
     {
         this.token = token;
+    }
+    
+    public Set<Issue> getWatchingIssues()
+    {
+        return watchingIssues;
+    }
+
+    public void setWatchingIssues(Set<Issue> watchingIssues)
+    {
+        this.watchingIssues = watchingIssues;
     }
 
 }

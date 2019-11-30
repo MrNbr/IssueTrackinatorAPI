@@ -179,28 +179,22 @@ public class IssueController
         
         if (!userOpt.isPresent()) {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED,
-            "Action not available");
+            "Action not available, unknown user");
         }
         
         User user = userOpt.get();
-        Optional<Watcher> watcherOpt = watcherRepository.findById(user.getId());
+        Set<Issue> watchingIssues = user.getWatchingIssues();
         
-        if (!watcherOpt.isPresent()){
-            Watcher watcher = new Watcher(user.getId());
-            watcherRepository.save(watcher);
-            
-            watcherOpt = watcherRepository.findById(user.getId());
-            
-        }
-        
-        Watcher watcher = watcherOpt.get();
-        if (watcherOpt.get().isWatching(id)) {
+        if (watchingIssues.contains(issue)) {
             throw new HttpClientErrorException(HttpStatus.NOT_ACCEPTABLE,
             "Already watching this issue.");
         }
         
-        watcher.addWatcher(id);
-        watcherRepository.save(watcher);
+        Issue issue = issueOpt.get();
+        watchingIssues.add(issue);
+        
+        user.setWatchingIssues(watchIssue);
+        UserRepository.save(user);
         
         return issue;
     }
@@ -219,24 +213,24 @@ public class IssueController
         
         if (!userOpt.isPresent()) {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED,
-            "Action not available");
+            "Action not available, unknown user");
         }
         
         User user = userOpt.get();
-        Optional<Watcher> watcherOpt = watcherRepository.findById(user.getId());
+        Set<Issue> watchingIssues = user.getWatchingIssues();
         
         Issue issue = issueOpt.get();
-        Long issue_id = issue.getId();
-        
-        if (!watcherOpt.isPresent() || !watcherOpt.get().isWatching(id)){
+        if (!watchIssues.contains(issue)){
             throw new HttpClientErrorException(HttpStatus.NOT_ACCEPTABLE,
             "Cannot unwatch this issue due to is not even watched");
         }
         
-        Watcher watcher = watcherOpt.get();
-        watcher.removeWatcher(id);
-        watcherRepository.save(watcher);
+        Issue issue = issueOpt.get();
+        watchIssues.remove(issue);
         
+        user.setWatchingIssues(watchIssues);
+        userRepository.save(user);
+    
         return issue;
     }
 }

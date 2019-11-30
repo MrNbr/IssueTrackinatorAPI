@@ -22,4 +22,10 @@ public interface IssueRepository extends JpaRepository<Issue, Long>
     
     List<Issue> findByOrderByTypeAsc();
     List<Issue> findByOrderByTypeDsc();
+    
+    List<Issue> findByOrderByCreationDateAsc();
+    List<Issue> findByOrderByCreationDateDsc();
+    
+    List<Issue> findByOrderByUpdateDateAsc();
+    List<Issue> findByOrderByUpdateDateDsc();
 }
