@@ -39,7 +39,9 @@ public class TokenFilter implements Filter
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         Enumeration<String> headerNames = httpRequest.getHeaderNames();
         if (httpRequest.getMethod().equals("POST")
-            && httpRequest.getRequestURI().contains("/api/users"))
+            && httpRequest.getRequestURI().contains("/api/users")
+            || httpRequest.getMethod().equals("GET")
+                && httpRequest.getRequestURI().contains("/api/issues"))
         {
             chain.doFilter(request, response);
         }
@@ -56,7 +58,8 @@ public class TokenFilter implements Filter
                     {
                         chain.doFilter(request, response);
                     }
-                    else {
+                    else
+                    {
                         ((HttpServletResponse) response).sendError(404,
                             "There's no user with this token");
                         return;
