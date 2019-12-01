@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -206,14 +207,14 @@ public class IssueController
     }
 
     @PostMapping("/{id}/vote")
-    Issue upvoteIssue(@PathVariable Long id)
+    Issue upvoteIssue(@PathVariable Long id, @RequestHeader("api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())
         {
             Issue issue = issueOpt.get();
             Set<User> votes = issue.getVotesUsers();
-            User user = userRepository.findAll().get(0); // Here find the user with token
+            User user = userRepository.findByToken(token).get(); // Here find the user with token
             if (votes.contains(user))
             {
                 throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
@@ -230,14 +231,14 @@ public class IssueController
     }
 
     @DeleteMapping("/{id}/vote")
-    Issue unvoteIssue(@PathVariable Long id)
+    Issue unvoteIssue(@PathVariable Long id, @RequestHeader("api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())
         {
             Issue issue = issueOpt.get();
             Set<User> votes = issue.getVotesUsers();
-            User user = userRepository.findAll().get(0); // Here find the user with token
+            User user = userRepository.findByToken(token).get(); // Here find the user with token
             if (!votes.contains(user))
             {
                 throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
