@@ -30,8 +30,6 @@ import com.issuetrackinator.issuetrackinator.model.IssueStatus;
 import com.issuetrackinator.issuetrackinator.model.User;
 import com.issuetrackinator.issuetrackinator.repository.IssueRepository;
 import com.issuetrackinator.issuetrackinator.repository.UserRepository;
-import com.issuetrackinator.issuetrackinator.model.IssueDefaultFilter;
-import com.issuetrackinator.issuetrackinator.model.IssueLogedFilter;
 
 @RestController
 @RequestMapping("/api" + IssueController.ISSUE_PATH)
@@ -147,10 +145,9 @@ public class IssueController
                              @RequestParam(required = false, defaultValue = "DESC", value="order") String order,
                              @RequestParam(required = false, defaultValue = "id", value="value") String value,
                              /*@RequestParam(required = false, defaultValue = "0", value="page") String page,*/
-                             @RequestHeader(value="api_key", defaultValue="-1") String api_key){
-                             
-        Optional<User> userOpt = userRepository.findByToken(api_key);
+                             @RequestHeader(required = false, value="api_key", defaultValue="-1") String api_key){
         
+        Optional<User> userOpt = userRepository.findByToken(api_key);
         if (!userOpt.isPresent() && !filter.toUpperCase().equals("ALL") && !filter.toUpperCase().equals("OPEN")) {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED,
             "Cannot apply provided filter");
