@@ -53,8 +53,8 @@ public class IssueController
                              @RequestParam(required = false, defaultValue = "id", value="sort") String sort,
                              @RequestParam(required = false, defaultValue = "DESC", value="order") String order,
                              @RequestParam(required = false, defaultValue = "id", value="value") String value,
-                             @RequestParam(required = false, defaultValue = "0", value="page") String page),
-                             @RequestHeader(value="api_key", defaultValue="-1")
+                             @RequestParam(required = false, defaultValue = "0", value="page") String page,
+                             @RequestHeader(value="api_key", defaultValue="-1"))
     {
         List<Issue> select = issueRepository.findAll();
         Optional<User> userOpt = userRepository.findByToken(api_key);

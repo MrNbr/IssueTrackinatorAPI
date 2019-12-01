@@ -11,6 +11,9 @@ public interface IssueRepository extends JpaRepository<Issue, Long>
     List<Issue> findByOrderByIdAsc();
     List<Issue> findByOrderByIdDsc();
     
+    List<Issue> findByOrderByIdAsc();
+    List<Issue> findByOrderByIdDsc();
+    
     List<Issue> findByOrderByUserAssigneeAsc();
     List<Issue> findByOrderByUserAssigneeDsc();
     
