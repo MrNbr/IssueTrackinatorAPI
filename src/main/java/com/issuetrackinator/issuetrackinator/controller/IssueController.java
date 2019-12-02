@@ -1,5 +1,6 @@
 package com.issuetrackinator.issuetrackinator.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.issuetrackinator.issuetrackinator.model.Comment;
@@ -29,9 +31,11 @@ import com.issuetrackinator.issuetrackinator.model.CommentDto;
 import com.issuetrackinator.issuetrackinator.model.Issue;
 import com.issuetrackinator.issuetrackinator.model.IssueDto;
 import com.issuetrackinator.issuetrackinator.model.IssueStatus;
+import com.issuetrackinator.issuetrackinator.model.UploadedFile;
 import com.issuetrackinator.issuetrackinator.model.User;
 import com.issuetrackinator.issuetrackinator.repository.CommentRepository;
 import com.issuetrackinator.issuetrackinator.repository.IssueRepository;
+import com.issuetrackinator.issuetrackinator.repository.UploadedFileRepository;
 import com.issuetrackinator.issuetrackinator.repository.UserRepository;
 
 @RestController
@@ -49,6 +53,9 @@ public class IssueController
 
     @Autowired
     CommentRepository commentRepository;
+
+    @Autowired
+    UploadedFileRepository uploadedFileRepository;
 
     private List<Issue> sortby(String sort)
     {
@@ -527,4 +534,89 @@ public class IssueController
         throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
             "Couldn't find issue with the specified id");
     }
+
+    @PutMapping("{id}/attachments")
+    Issue addAttachments(@PathVariable Long id, @RequestHeader("api_key") String token,
+        @RequestParam("files") MultipartFile[] files) throws IOException
+    {
+        Optional<Issue> issueOpt = issueRepository.findById(id);
+        if (issueOpt.isPresent())
+        {
+            Issue issue = issueOpt.get();
+            if (!issue.getUserCreator().equals(userRepository.findByToken(token).get()))
+            {
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                    "Can't add attachments to a issue you didn't create");
+            }
+            for (MultipartFile file : files)
+            {
+                UploadedFile newFile = new UploadedFile();
+                newFile.setFile(file.getBytes());
+                newFile.setName(file.getName());
+                newFile.setContentType(file.getContentType());
+                uploadedFileRepository.save(newFile);
+                issue.addAttachment(newFile);
+            }
+            issueRepository.save(issue);
+            return issue;
+        }
+        else
+        {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                "Couldn't find a issue with the specified id");
+        }
+    }
+
+    @GetMapping("{id}/attachments")
+    Set<UploadedFile> getAttachments(@PathVariable Long id, @RequestHeader("api_key") String token)
+    {
+        Optional<Issue> issueOpt = issueRepository.findById(id);
+        if (issueOpt.isPresent())
+        {
+            Issue issue = issueOpt.get();
+            return issue.getAttachments();
+        }
+        else
+        {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                "Couldn't find a issue with the specified id");
+        }
+
+    }
+
+    @GetMapping("{id}/attachments/{fileId}")
+    byte[] getSingleAttachment(@PathVariable Long id, @PathVariable Long fileId,
+        @RequestHeader("api_key") String token)
+    {
+        Optional<Issue> issueOpt = issueRepository.findById(id);
+        if (issueOpt.isPresent())
+        {
+            return uploadedFileRepository.findById(fileId).get().getFile();
+        }
+        else
+        {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                "Couldn't find a issue with the specified id");
+        }
+    }
+
+    @DeleteMapping("{id}/attachments/{fileId}")
+    Set<UploadedFile> deleteAttachment(@PathVariable Long id, @PathVariable Long fileId,
+        @RequestHeader("api_key") String token)
+    {
+        Optional<Issue> issueOpt = issueRepository.findById(id);
+        if (issueOpt.isPresent())
+        {
+            uploadedFileRepository.delete(uploadedFileRepository.findById(fileId).get());
+            issueOpt.get().getAttachments().removeIf(file -> file.getId().equals(fileId));
+            return issueOpt.get().getAttachments();
+        }
+        else
+        {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                "Couldn't find a issue with the specified id");
+        }
+
+    }
+
 }

@@ -47,6 +47,11 @@ public class Issue
     @JoinTable(name = "comments", joinColumns = @JoinColumn(name = "issueId"), inverseJoinColumns = @JoinColumn(name = "commentId"))
     List<Comment> comments;
 
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "attachments")
+    Set<UploadedFile> attachments;
+
     @NotBlank
     private String title;
 
@@ -197,6 +202,21 @@ public class Issue
     public void setComments(List<Comment> comments)
     {
         this.comments = comments;
+    }
+
+    public Set<UploadedFile> getAttachments()
+    {
+        return attachments;
+    }
+
+    public void setAttachments(Set<UploadedFile> attachments)
+    {
+        this.attachments = attachments;
+    }
+
+    public void addAttachment(UploadedFile file)
+    {
+        this.attachments.add(file);
     }
 
 }
