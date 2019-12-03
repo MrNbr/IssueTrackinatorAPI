@@ -6,6 +6,8 @@ import com.issuetrackinator.issuetrackinator.repository.CommentRepository;
 import com.issuetrackinator.issuetrackinator.repository.IssueRepository;
 import com.issuetrackinator.issuetrackinator.repository.UploadedFileRepository;
 import com.issuetrackinator.issuetrackinator.repository.UserRepository;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +15,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.text.SimpleDateFormat;
 import java.io.IOException;
 import java.util.*;
 
+@Api(tags = "Issue controller")
 @RestController
 @CrossOrigin
 @RequestMapping("/api" + IssueController.ISSUE_PATH)
@@ -130,9 +134,8 @@ public class IssueController
                     }
                     break;
                 case "ASSIGN":
-                    User asignee = candidate.getUserAsignee();
-                    if (asignee != null && asignee.getId().equals(Long.parseLong(value)))
-                    {
+                    User assignee = candidate.getUserAssignee();
+                    if (assignee != null && assignee.getId().equals(Long.parseLong(value))){
                         select.add(candidate);
                     }
                     break;
@@ -144,8 +147,8 @@ public class IssueController
         return select;
     }
 
-    // Cas base Get
     @GetMapping
+    @ApiOperation("Get all the issues with the specified filter")
     List<Issue> getAllIssues(
         @RequestParam(required = false, defaultValue = "all", value = "filter") String filter,
         @RequestParam(required = false, defaultValue = "id", value = "sort") String sort,
@@ -180,6 +183,7 @@ public class IssueController
     }
 
     @GetMapping("/{id}")
+    @ApiOperation("Get an issue by the id")
     Issue getIssueById(@PathVariable Long id)
     {
         Optional<Issue> issue = issueRepository.findById(id);
@@ -191,9 +195,9 @@ public class IssueController
             "Couldn't find issue with the specified id");
     }
 
-    // Cas base Post
     @PostMapping
-    Issue createNewIssue(@Valid @RequestBody IssueDto issueDto)
+    @ApiOperation("Create a new issue")
+    Issue createNewIssue(@Valid @RequestBody NewIssueDTO issueDto)
     {
         Date date = new Date();
         Issue issue = new Issue();
@@ -205,10 +209,10 @@ public class IssueController
         issue.setStatus(IssueStatus.NEW);
         issue.setTitle(issueDto.getTitle());
         issue.setType(issueDto.getType());
-        issue.setUserCreator(userRepository.findById(issueDto.getUserCreator()).get());
-        if (issueDto.getUserAssignee() != null)
+        issue.setUserCreator(userRepository.findById(issueDto.getUserCreatorId()).get());
+        if (issueDto.getUserAssigneeId() != null)
         {
-            issue.setUserAssignee(userRepository.findById(issueDto.getUserAssignee()).get());
+            issue.setUserAssignee(userRepository.findById(issueDto.getUserAssigneeId()).get());
         }
         return issueRepository.save(issue);
     }
@@ -291,12 +295,14 @@ public class IssueController
     }
 
     @DeleteMapping("/{id}")
+    @ApiOperation("Delete an issue")
     void deleteIssueById(@PathVariable Long id)
     {
         issueRepository.deleteById(id);
     }
 
     @PostMapping("/{id}/vote")
+    @ApiOperation("Upvote an issue")
     Issue upvoteIssue(@PathVariable Long id, @RequestHeader("api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
@@ -321,6 +327,7 @@ public class IssueController
     }
 
     @DeleteMapping("/{id}/vote")
+    @ApiOperation("Unvote an issue")
     Issue unvoteIssue(@PathVariable Long id, @RequestHeader("api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
@@ -345,8 +352,8 @@ public class IssueController
     }
 
     @PostMapping("/{id}/watch")
-    Issue watchIssue(@PathVariable Long id,
-        @RequestHeader(value = "api_key", defaultValue = "-1") String api_key)
+    @ApiOperation("Set an issue as watched")
+    Issue watchIssue(@PathVariable Long id, @RequestHeader(value="api_key", defaultValue="-1") String api_key)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
 
@@ -383,8 +390,8 @@ public class IssueController
     }
 
     @DeleteMapping("/{id}/watch")
-    Issue unwatchIssue(@PathVariable Long id,
-        @RequestHeader(value = "api_key", defaultValue = "-1") String api_key)
+    @ApiOperation("Unwatch an issue")
+    Issue unwatchIssue(@PathVariable Long id, @RequestHeader(value="api_key", defaultValue="-1") String api_key)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
 

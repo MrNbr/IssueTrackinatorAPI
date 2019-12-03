@@ -1,33 +1,27 @@
 package com.issuetrackinator.issuetrackinator.controller;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.common.hash.Hashing;
+import com.issuetrackinator.issuetrackinator.model.NewUserDTO;
+import com.issuetrackinator.issuetrackinator.model.User;
+import com.issuetrackinator.issuetrackinator.model.UserCredentialsDTO;
+import com.issuetrackinator.issuetrackinator.repository.UserRepository;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+
+import javax.validation.Valid;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpClientErrorException;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.google.common.hash.Hashing;
-import com.issuetrackinator.issuetrackinator.model.User;
-import com.issuetrackinator.issuetrackinator.model.UserCredentialsDTO;
-import com.issuetrackinator.issuetrackinator.repository.UserRepository;
-
+@Api(tags = "User controller")
 @RestController
 @CrossOrigin
 @RequestMapping(path = "/api" + UserController.USER_PATH)
@@ -39,9 +33,10 @@ public class UserController
 
     static final String USER_PATH = "/users";
 
-    private String emailRegex = "^(.+)@(.+)$";
+    private static final String emailRegex = "^(.+)@(.+)$";
 
     @GetMapping
+    @ApiOperation("Get all the users")
     List<User> getUsers(@RequestHeader("api_key") String token)
     {
         List<User> users = userRepository.findAll();
@@ -57,6 +52,7 @@ public class UserController
     }
 
     @GetMapping("{id}")
+    @ApiOperation("Get a user by the id")
     User getUserById(@PathVariable final Long id, @RequestHeader("api_key") String token)
     {
         Optional<User> user = userRepository.findById(id);
@@ -77,24 +73,28 @@ public class UserController
     }
 
     @PostMapping
-    User createUser(@Valid @RequestBody User user)
+    @ApiOperation("Create a new user")
+    User createUser(@Valid @RequestBody NewUserDTO userDTO)
     {
         Pattern pattern = Pattern.compile(emailRegex);
-        Matcher matcher = pattern.matcher(user.getEmail());
+        Matcher matcher = pattern.matcher(userDTO.getEmail());
         if (!matcher.matches())
         {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "The email is not valid");
         }
-        if (userRepository.findByUsername(user.getUsername()).isPresent())
+        if (userRepository.findByUsername(userDTO.getUsername()).isPresent())
         {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
                 "The username is already taken");
         }
-        if (userRepository.findByEmail(user.getEmail()).isPresent())
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent())
         {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
                 "The email is already in use");
         }
+        // Creating an instance of User with the content of the DTO
+        User user = new User(userDTO.getUsername(), userDTO.getPersonalName(), userDTO.getEmail(),
+                             userDTO.getPassword());
         user.setPassword(
             Hashing.sha256().hashString(user.getPassword(), StandardCharsets.UTF_8).toString());
         user.setToken(
@@ -143,6 +143,8 @@ public class UserController
     }
 
     @DeleteMapping("/{id}")
+    @ApiOperation("Delete a user")
+    void deleteUserById(@PathVariable final Long id)
     void deleteUserById(@PathVariable final Long id, @RequestHeader("api_key") String token)
     {
         if (userRepository.findByToken(token).get().equals(userRepository.findById(id).get()))
