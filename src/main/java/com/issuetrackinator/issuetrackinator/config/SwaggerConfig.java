@@ -26,7 +26,7 @@ public class SwaggerConfig {
 
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.any())
+                .apis(RequestHandlerSelectors.basePackage("com.issuetrackinator.issuetrackinator"))
                 .paths(PathSelectors.any())
                 .build()
                 .host("localhost:8080")
