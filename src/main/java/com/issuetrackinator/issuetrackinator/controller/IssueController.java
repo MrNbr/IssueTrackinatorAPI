@@ -124,8 +124,8 @@ public class IssueController
                     }
                     break;
                 case "ASSIGN":
-                    User asignee = candidate.getUserAsignee();
-                    if (asignee != null && asignee.getId().equals(Long.parseLong(value))){
+                    User assignee = candidate.getUserAssignee();
+                    if (assignee != null && assignee.getId().equals(Long.parseLong(value))){
                         select.add(candidate);
                     }
                     break;
