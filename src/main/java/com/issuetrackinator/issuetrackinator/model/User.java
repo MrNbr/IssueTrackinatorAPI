@@ -15,6 +15,7 @@ import javax.persistence.JoinTable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @JsonIgnoreProperties("hibernateLazyInitializer")
@@ -22,27 +23,35 @@ public class User
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ApiModelProperty(position = 0)
     private Long id;
 
     @NotBlank
     @Column(unique = true)
+    @ApiModelProperty(example = "tom", position = 1)
     private String username;
 
+    @ApiModelProperty(example = "Tom Bombadil", position = 2)
     private String personalName;
 
     @NotBlank
     @Column(unique = true)
+    @ApiModelProperty(example = "email@provider.com", position = 3)
     private String email;
+
+    @NotBlank
+    @ApiModelProperty(example = "password123", position = 4)
+    private String password;
+
+    @ApiModelProperty(example = "6afd6dd40f7ff2d557743da155c3629608391f819cd86c6c93d0596a033e45a6", position = 5)
+    private String token;
     
     @JsonIgnore
+    @ApiModelProperty(position = 6)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "watchers", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "issueId"))
     Set<Issue> watchingIssues;
 
-    @NotBlank
-    private String password;
-
-    private String token;
 
     public User() { }
 
