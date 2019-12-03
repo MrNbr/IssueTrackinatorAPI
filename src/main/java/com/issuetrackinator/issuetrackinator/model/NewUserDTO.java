@@ -1,13 +1,19 @@
 package com.issuetrackinator.issuetrackinator.model;
 
+import io.swagger.annotations.ApiModelProperty;
+
 public class NewUserDTO {
 
+    @ApiModelProperty(example = "tom", position = 0)
     private String username;
 
+    @ApiModelProperty(example = "Tom Bombadil", position = 1)
     private String personalName;
 
+    @ApiModelProperty(example = "email@provider.com", position = 2)
     private String email;
 
+    @ApiModelProperty(example = "password123", position = 3)
     private String password;
 
 
