@@ -44,6 +44,15 @@ public class User
 
     private String token;
 
+    public User() { }
+
+    public User(String username, String personalName, String email, String password) {
+        this.username = username;
+        this.personalName = personalName;
+        this.email = email;
+        this.password = password;
+    }
+
     public Long getId()
     {
         return id;

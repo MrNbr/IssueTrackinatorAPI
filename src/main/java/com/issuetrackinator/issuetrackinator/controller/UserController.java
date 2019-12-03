@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import javax.validation.Valid;
 
+import com.issuetrackinator.issuetrackinator.model.NewUserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,25 +56,28 @@ public class UserController
     }
 
     @PostMapping
-    User createUser(@Valid @RequestBody User user)
+    User createUser(@Valid @RequestBody NewUserDTO userDTO)
     {
 
         Pattern pattern = Pattern.compile(emailRegex);
-        Matcher matcher = pattern.matcher(user.getEmail());
+        Matcher matcher = pattern.matcher(userDTO.getEmail());
         if (!matcher.matches())
         {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "The email is not valid");
         }
-        if (userRepository.findByUsername(user.getUsername()).isPresent())
+        if (userRepository.findByUsername(userDTO.getUsername()).isPresent())
         {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
                 "The username is already taken");
         }
-        if (userRepository.findByEmail(user.getEmail()).isPresent())
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent())
         {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
                 "The email is already in use");
         }
+        // Creating an instance of User with the content of the DTO
+        User user = new User(userDTO.getUsername(), userDTO.getPersonalName(), userDTO.getEmail(),
+                             userDTO.getPassword());
         user.setPassword(
             Hashing.sha256().hashString(user.getPassword(), StandardCharsets.UTF_8).toString());
         user.setToken(
