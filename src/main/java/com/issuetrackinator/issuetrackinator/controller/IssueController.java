@@ -160,9 +160,9 @@ public class IssueController
         if (api_key != null){
             userOpt = userRepository.findByToken(api_key);
         }
-         
-        if (!userOpt.isPresent() && !filter.toUpperCase().equals("ALL")
-            && !filter.toUpperCase().equals("OPEN"))
+        
+        if (!userOpt.isPresent() && (filter.toUpperCase().equals("MINE")
+            || filter.toUpperCase().equals("WATCHING")))
         {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED,
                 "Cannot apply provided filter");
