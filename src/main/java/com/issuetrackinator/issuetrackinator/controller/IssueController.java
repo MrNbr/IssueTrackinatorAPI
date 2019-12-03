@@ -152,10 +152,15 @@ public class IssueController
         @RequestParam(required = false, defaultValue = "DESC", value = "order") String order,
         @RequestParam(required = false, defaultValue = "id", value = "value") String value,
         /* @RequestParam(required = false, defaultValue = "0", value="page") String page, */
-        @RequestHeader(required = false, value = "api_key", defaultValue = "-1") String api_key)
+        @RequestHeader(required = false, value = "api_key") String api_key)
     {
 
-        Optional<User> userOpt = userRepository.findByToken(api_key);
+        Optional<User> userOpt = Optional.empty();
+
+        if (api_key != null){
+            userOpt = userRepository.findByToken(api_key);
+        }
+         
         if (!userOpt.isPresent() && !filter.toUpperCase().equals("ALL")
             && !filter.toUpperCase().equals("OPEN"))
         {
