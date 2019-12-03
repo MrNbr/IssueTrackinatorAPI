@@ -10,16 +10,29 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
     @Bean
     public Docket api() {
+        Set<String> protocols = new HashSet<>();
+        protocols.add("http");
+
+        Set<String> mimeTypes = new HashSet<>();
+        mimeTypes.add("application/json");
+
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
                 .build()
+                .host("localhost:8080")
+                .protocols(protocols)
+                .produces(mimeTypes)
+                .consumes(mimeTypes)
                 .apiInfo(getApiInfo());
     }
 
