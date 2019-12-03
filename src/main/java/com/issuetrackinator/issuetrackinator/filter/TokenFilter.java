@@ -38,7 +38,7 @@ public class TokenFilter implements Filter
     {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         Enumeration<String> headerNames = httpRequest.getHeaderNames();
-        
+
         String requestMethod = httpRequest.getMethod();
         String requestURI = httpRequest.getRequestURI();
 
