@@ -1,44 +1,23 @@
 package com.issuetrackinator.issuetrackinator.controller;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.issuetrackinator.issuetrackinator.model.Comment;
-import com.issuetrackinator.issuetrackinator.model.CommentDto;
-import com.issuetrackinator.issuetrackinator.model.Issue;
-import com.issuetrackinator.issuetrackinator.model.IssueDto;
-import com.issuetrackinator.issuetrackinator.model.IssueStatus;
-import com.issuetrackinator.issuetrackinator.model.UploadedFile;
-import com.issuetrackinator.issuetrackinator.model.User;
+import com.issuetrackinator.issuetrackinator.model.*;
 import com.issuetrackinator.issuetrackinator.repository.CommentRepository;
 import com.issuetrackinator.issuetrackinator.repository.IssueRepository;
 import com.issuetrackinator.issuetrackinator.repository.UploadedFileRepository;
 import com.issuetrackinator.issuetrackinator.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.*;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api" + IssueController.ISSUE_PATH)
 @JsonIgnoreProperties("hibernateLazyInitializer")
 public class IssueController
