@@ -15,7 +15,6 @@ import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @JsonIgnoreProperties("hibernateLazyInitializer")
@@ -43,7 +42,6 @@ public class User
     @NotBlank
     private String password;
 
-    @JsonProperty("token")
     private String token;
 
     public Long getId()
