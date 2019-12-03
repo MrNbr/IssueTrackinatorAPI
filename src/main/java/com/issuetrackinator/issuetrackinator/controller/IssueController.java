@@ -7,6 +7,7 @@ import com.issuetrackinator.issuetrackinator.model.NewIssueDTO;
 import com.issuetrackinator.issuetrackinator.model.User;
 import com.issuetrackinator.issuetrackinator.repository.IssueRepository;
 import com.issuetrackinator.issuetrackinator.repository.UserRepository;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Api(tags = "Issue controller")
 @RestController
 @RequestMapping("/api" + IssueController.ISSUE_PATH)
 @JsonIgnoreProperties("hibernateLazyInitializer")
@@ -125,7 +127,7 @@ public class IssueController
     }
 
     @GetMapping
-    @ApiOperation(value = "Get all the issues with the specified filter", tags = "Issue controller")
+    @ApiOperation("Get all the issues with the specified filter")
     List<Issue> getAllIssues(@RequestParam(required = false, defaultValue = "all", value="filter") String filter,
                              @RequestParam(required = false, defaultValue = "id", value="sort") String sort,
                              @RequestParam(required = false, defaultValue = "DESC", value="order") String order,
@@ -150,7 +152,7 @@ public class IssueController
     }
 
     @GetMapping("/{id}")
-    @ApiOperation(value = "Get an issue by the id", tags = "Issue controller")
+    @ApiOperation("Get an issue by the id")
     Issue getIssueById(@PathVariable Long id)
     {
         Optional<Issue> issue = issueRepository.findById(id);
@@ -163,7 +165,7 @@ public class IssueController
     }
 
     @PostMapping
-    @ApiOperation(value = "Create a new issue", tags = "Issue controller")
+    @ApiOperation("Create a new issue")
     Issue createNewIssue(@Valid @RequestBody NewIssueDTO issueDto)
     {
         Date date = new Date();
@@ -187,14 +189,14 @@ public class IssueController
     }
 
     @DeleteMapping("/{id}")
-    @ApiOperation(value = "Delete an issue", tags = "Issue controller")
+    @ApiOperation("Delete an issue")
     void deleteIssueById(@PathVariable Long id)
     {
         issueRepository.deleteById(id);
     }
 
     @PostMapping("/{id}/vote")
-    @ApiOperation(value = "Upvote an issue", tags = "Issue controller")
+    @ApiOperation("Upvote an issue")
     Issue upvoteIssue(@PathVariable Long id, @RequestHeader("api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
@@ -219,7 +221,7 @@ public class IssueController
     }
 
     @DeleteMapping("/{id}/vote")
-    @ApiOperation(value = "Unvote an issue", tags = "Issue controller")
+    @ApiOperation("Unvote an issue")
     Issue unvoteIssue(@PathVariable Long id, @RequestHeader("api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
@@ -244,7 +246,7 @@ public class IssueController
     }
     
     @PostMapping("/{id}/watch")
-    @ApiOperation(value = "Set an issue as watched", tags = "Issue controller")
+    @ApiOperation("Set an issue as watched")
     Issue watchIssue(@PathVariable Long id, @RequestHeader(value="api_key", defaultValue="-1") String api_key)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
@@ -279,7 +281,7 @@ public class IssueController
     }
 
     @DeleteMapping("/{id}/watch")
-    @ApiOperation(value = "Unwatch an issue", tags = "Issue controller")
+    @ApiOperation("Unwatch an issue")
     Issue unwatchIssue(@PathVariable Long id, @RequestHeader(value="api_key", defaultValue="-1") String api_key)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);

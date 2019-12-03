@@ -5,6 +5,7 @@ import com.google.common.hash.Hashing;
 import com.issuetrackinator.issuetrackinator.model.NewUserDTO;
 import com.issuetrackinator.issuetrackinator.model.User;
 import com.issuetrackinator.issuetrackinator.repository.UserRepository;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Api(tags = "User controller")
 @RestController
 @RequestMapping(path = "/api" + UserController.USER_PATH)
 @JsonIgnoreProperties("hibernateLazyInitializer")
@@ -31,14 +33,14 @@ public class UserController
     private static final String emailRegex = "^(.+)@(.+)$";
 
     @GetMapping
-    @ApiOperation(value = "Get all the users", tags = "User controller")
+    @ApiOperation("Get all the users")
     List<User> getUsers()
     {
         return userRepository.findAll();
     }
 
     @GetMapping("{id}")
-    @ApiOperation(value = "Get a user by the id", tags = "User controller")
+    @ApiOperation("Get a user by the id")
     User getUserById(@PathVariable final Long id)
     {
         Optional<User> user = userRepository.findById(id);
@@ -51,7 +53,7 @@ public class UserController
     }
 
     @PostMapping
-    @ApiOperation(value = "Create a new user", tags = "User controller")
+    @ApiOperation("Create a new user")
     User createUser(@Valid @RequestBody NewUserDTO userDTO)
     {
 
@@ -83,7 +85,7 @@ public class UserController
     }
 
     @DeleteMapping("/{id}")
-    @ApiOperation(value = "Delete a user", tags = "User controller")
+    @ApiOperation("Delete a user")
     void deleteUserById(@PathVariable final Long id)
     {
         userRepository.deleteById(id);
