@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,7 +79,6 @@ public class UserController
     @PostMapping
     User createUser(@Valid @RequestBody User user)
     {
-
         Pattern pattern = Pattern.compile(emailRegex);
         Matcher matcher = pattern.matcher(user.getEmail());
         if (!matcher.matches())
@@ -97,6 +97,45 @@ public class UserController
         }
         user.setPassword(
             Hashing.sha256().hashString(user.getPassword(), StandardCharsets.UTF_8).toString());
+        user.setToken(
+            Hashing.sha256().hashString(user.getUsername() + user.getEmail() + user.getPassword(),
+                StandardCharsets.UTF_8).toString());
+        return userRepository.save(user);
+    }
+
+    @PutMapping("/{id}")
+    User editUser(@RequestHeader("api_key") String token, @PathVariable final Long id,
+        @RequestBody User newUser)
+    {
+        Optional<User> userOpt = userRepository.findById(id);
+        if (!userOpt.isPresent())
+        {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "This user doesn't exist");
+        }
+        Pattern pattern = Pattern.compile(emailRegex);
+        Matcher matcher = pattern.matcher(newUser.getEmail());
+        if (!matcher.matches())
+        {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "The email is not valid");
+        }
+        if (!newUser.getUsername().equals(userOpt.get().getUsername())
+            && userRepository.findByUsername(newUser.getUsername()).isPresent())
+        {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                "The username is already taken");
+        }
+        if (!newUser.getEmail().equalsIgnoreCase(userOpt.get().getEmail())
+            && userRepository.findByEmail(newUser.getEmail()).isPresent())
+        {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                "The email is already in use");
+        }
+        User user = userOpt.get();
+        user.setUsername(newUser.getUsername());
+        user.setEmail(newUser.getEmail());
+        user.setPersonalName(newUser.getPersonalName());
+        user.setPassword(
+            Hashing.sha256().hashString(newUser.getPassword(), StandardCharsets.UTF_8).toString());
         user.setToken(
             Hashing.sha256().hashString(user.getUsername() + user.getEmail() + user.getPassword(),
                 StandardCharsets.UTF_8).toString());
