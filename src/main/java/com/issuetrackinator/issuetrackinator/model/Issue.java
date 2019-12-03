@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+
 import java.util.Set;
 
 @Entity
@@ -57,6 +58,15 @@ public class Issue
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "idUserAssignee")
     private User userAssignee;
+  
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "comments", joinColumns = @JoinColumn(name = "issueId"), inverseJoinColumns = @JoinColumn(name = "commentId"))
+    List<Comment> comments;
+
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "attachments")
+    Set<UploadedFile> attachments;
 
     @NotNull
     @ApiModelProperty(position = 10)
@@ -162,4 +172,30 @@ public class Issue
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
     }
+
+    public List<Comment> getComments()
+    {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments)
+    {
+        this.comments = comments;
+    }
+
+    public Set<UploadedFile> getAttachments()
+    {
+        return attachments;
+    }
+
+    public void setAttachments(Set<UploadedFile> attachments)
+    {
+        this.attachments = attachments;
+    }
+
+    public void addAttachment(UploadedFile file)
+    {
+        this.attachments.add(file);
+    }
+
 }
