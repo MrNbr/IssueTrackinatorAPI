@@ -38,12 +38,15 @@ public class TokenFilter implements Filter
     {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         Enumeration<String> headerNames = httpRequest.getHeaderNames();
+
         String requestMethod = httpRequest.getMethod();
         String requestURI = httpRequest.getRequestURI();
 
         if (requestMethod.equals("POST") && requestURI.contains("/api/users")
-                || requestMethod.equals("GET") && (requestURI.contains("/api/issues")
-                || requestURI.contains("api-docs") || requestURI.contains("swagger") || requestURI.contains("webjars")))
+            || requestMethod.equals("GET") && (requestURI.contains("/api/issues")
+                || requestMethod.equals("GET") && requestURI.contains("/api/users/regenerateToken")
+                || requestURI.contains("api-docs") || requestURI.contains("swagger")
+                || requestURI.contains("webjars")))
         {
             chain.doFilter(request, response);
         }
