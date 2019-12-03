@@ -41,7 +41,9 @@ public class TokenFilter implements Filter
         if (httpRequest.getMethod().equals("POST")
             && httpRequest.getRequestURI().contains("/api/users")
             || httpRequest.getMethod().equals("GET")
-                && httpRequest.getRequestURI().contains("/api/issues"))
+                && httpRequest.getRequestURI().contains("/api/issues")
+            || httpRequest.getMethod().equals("GET")
+                && httpRequest.getRequestURI().contains("/api/users/regenerateToken"))
         {
             chain.doFilter(request, response);
         }

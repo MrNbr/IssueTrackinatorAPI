@@ -10,12 +10,21 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.hash.Hashing;
 import com.issuetrackinator.issuetrackinator.model.User;
+import com.issuetrackinator.issuetrackinator.model.UserCredentialsDTO;
 import com.issuetrackinator.issuetrackinator.repository.UserRepository;
 
 @RestController
@@ -32,18 +41,35 @@ public class UserController
     private String emailRegex = "^(.+)@(.+)$";
 
     @GetMapping
-    List<User> getUsers()
+    List<User> getUsers(@RequestHeader("api_key") String token)
     {
-        return userRepository.findAll();
+        List<User> users = userRepository.findAll();
+        User userRequest = userRepository.findByToken(token).get();
+        for (User user : users)
+        {
+            if (!user.equals(userRequest))
+            {
+                user.setToken(null);
+            }
+        }
+        return users;
     }
 
     @GetMapping("{id}")
-    User getUserById(@PathVariable final Long id)
+    User getUserById(@PathVariable final Long id, @RequestHeader("api_key") String token)
     {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent())
         {
-            return user.get();
+            if (userRepository.findByToken(token).get().equals(user.get()))
+            {
+                return user.get();
+            }
+            else
+            {
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                    "Can't get user info of another user that it's not yours");
+            }
         }
         throw new HttpClientErrorException(HttpStatus.FORBIDDEN,
             "Couldn't find a user with the specified id");
@@ -78,9 +104,68 @@ public class UserController
     }
 
     @DeleteMapping("/{id}")
-    void deleteUserById(@PathVariable final Long id)
+    void deleteUserById(@PathVariable final Long id, @RequestHeader("api_key") String token)
     {
-        userRepository.deleteById(id);
+        if (userRepository.findByToken(token).get().equals(userRepository.findById(id).get()))
+        {
+            userRepository.deleteById(id);
+        }
+        else
+        {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                "Can't delete a user that it's not yours");
+        }
+
+    }
+
+    @GetMapping("/regenerateToken")
+    String regenerateToken(@RequestBody UserCredentialsDTO credentials)
+    {
+        String credKey;
+        if (credentials.getUsername() != null)
+        {
+            credKey = credentials.getUsername();
+            if (credentials.getPassword() == null)
+            {
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Password is necessary");
+            }
+            Optional<User> userOpt = userRepository.findByUsername(credKey);
+            if (userOpt.isPresent() && userOpt.get().getPassword().equals(Hashing.sha256()
+                .hashString(credentials.getPassword(), StandardCharsets.UTF_8).toString()))
+            {
+                return userOpt.get().getToken();
+            }
+            else
+            {
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                    "Credentials are not correct");
+            }
+        }
+        else if (credentials.getEmail() != null)
+        {
+            credKey = credentials.getEmail();
+            if (credentials.getPassword() == null)
+            {
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Password is necessary");
+            }
+            Optional<User> userOpt = userRepository.findByEmail(credKey);
+            if (userOpt.isPresent() && userOpt.get().getPassword().equals(Hashing.sha256()
+                .hashString(credentials.getPassword(), StandardCharsets.UTF_8).toString()))
+            {
+                return userOpt.get().getToken();
+            }
+            else
+            {
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                    "Credentials are not correct");
+            }
+        }
+        else
+        {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                "Email or username is necessary");
+        }
+
     }
 
 }
