@@ -19,14 +19,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.issuetrackinator.issuetrackinator.model.Issue;
-import com.issuetrackinator.issuetrackinator.model.IssueDto;
+import com.issuetrackinator.issuetrackinator.model.NewIssueDTO;
 import com.issuetrackinator.issuetrackinator.model.IssueStatus;
 import com.issuetrackinator.issuetrackinator.model.User;
 import com.issuetrackinator.issuetrackinator.repository.IssueRepository;
@@ -178,7 +177,7 @@ public class IssueController
 
     // Cas base Post
     @PostMapping
-    Issue createNewIssue(@Valid @RequestBody IssueDto issueDto)
+    Issue createNewIssue(@Valid @RequestBody NewIssueDTO issueDto)
     {
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
@@ -192,10 +191,10 @@ public class IssueController
         issue.setStatus(IssueStatus.NEW);
         issue.setTitle(issueDto.getTitle());
         issue.setType(issueDto.getType());
-        issue.setUserCreator(userRepository.findById(issueDto.getUserCreator()).get());
-        if (issueDto.getUserAssignee() != null)
+        issue.setUserCreator(userRepository.findById(issueDto.getUserCreatorId()).get());
+        if (issueDto.getUserAssigneeId() != null)
         {
-            issue.setUserAssignee(userRepository.findById(issueDto.getUserAssignee()).get());
+            issue.setUserAssignee(userRepository.findById(issueDto.getUserAssigneeId()).get());
         }
         return issueRepository.save(issue);
     }
