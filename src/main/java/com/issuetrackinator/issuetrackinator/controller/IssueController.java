@@ -22,9 +22,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.issuetrackinator.issuetrackinator.model.Comment;
@@ -88,7 +89,7 @@ public class IssueController
                 return issueRepository.findByOrderByUserAssigneeAsc();
 
             default:
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Cannot sort by provided field");
         }
     }
@@ -157,12 +158,13 @@ public class IssueController
                     break;
                 case "ASSIGN":
                     User assignee = candidate.getUserAssignee();
-                    if (assignee != null && assignee.getId().equals(Long.parseLong(value))){
+                    if (assignee != null && assignee.getId().equals(Long.parseLong(value)))
+                    {
                         select.add(candidate);
                     }
                     break;
                 default:
-                    throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Unknown filter");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown filter");
             }
         }
 
@@ -182,14 +184,15 @@ public class IssueController
 
         Optional<User> userOpt = Optional.empty();
 
-        if (api_key != null){
+        if (api_key != null)
+        {
             userOpt = userRepository.findByToken(api_key);
         }
 
-        if (!userOpt.isPresent() && (filter.toUpperCase().equals("MINE")
-            || filter.toUpperCase().equals("WATCHING")))
+        if (!userOpt.isPresent()
+            && (filter.toUpperCase().equals("MINE") || filter.toUpperCase().equals("WATCHING")))
         {
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED,
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                 "Cannot apply provided filter");
         }
 
@@ -213,12 +216,13 @@ public class IssueController
         {
             return issue.get();
         }
-        throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
             "Couldn't find issue with the specified id");
     }
 
     @PostMapping
     @ApiOperation("Create a new issue")
+    @ResponseStatus(HttpStatus.CREATED)
     Issue createNewIssue(@Valid @RequestBody NewIssueDTO issueDto)
     {
         Date date = new Date();
@@ -262,13 +266,13 @@ public class IssueController
             }
             else
             {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "You can't edit a issue you didn't create");
             }
         }
         else
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "Couldn't find issue with the specified id");
         }
     }
@@ -293,7 +297,7 @@ public class IssueController
             }
             if (enumStatus == null)
             {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Specified status doesn't exist");
             }
             issue.setStatus(enumStatus);
@@ -310,7 +314,7 @@ public class IssueController
         }
         else
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "Couldn't find issue with the specified id");
         }
 
@@ -318,6 +322,7 @@ public class IssueController
 
     @DeleteMapping("/{id}")
     @ApiOperation("Delete an issue")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteIssueById(@PathVariable Long id)
     {
         issueRepository.deleteById(id);
@@ -335,7 +340,7 @@ public class IssueController
             User user = userRepository.findByToken(token).get(); // Here find the user with token
             if (votes.contains(user))
             {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "User already voted this issue");
             }
             votes.add(user);
@@ -344,7 +349,7 @@ public class IssueController
             issueRepository.save(issue);
             return issue;
         }
-        throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
             "Couldn't find issue with the specified id");
     }
 
@@ -360,7 +365,7 @@ public class IssueController
             User user = userRepository.findByToken(token).get(); // Here find the user with token
             if (!votes.contains(user))
             {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "User didn't vote this issue");
             }
             votes.remove(user);
@@ -369,19 +374,20 @@ public class IssueController
             issueRepository.save(issue);
             return issue;
         }
-        throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
             "Couldn't find issue with the specified id");
     }
 
     @PostMapping("/{id}/watch")
     @ApiOperation("Set an issue as watched")
-    Issue watchIssue(@PathVariable Long id, @RequestHeader(value="api_key", defaultValue="-1") String api_key)
+    Issue watchIssue(@PathVariable Long id,
+        @RequestHeader(value = "api_key", defaultValue = "-1") String api_key)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
 
         if (!issueOpt.isPresent())
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "Couldn't find issue with the specified id");
         }
 
@@ -389,7 +395,7 @@ public class IssueController
 
         if (!userOpt.isPresent())
         {
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED,
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                 "Action not available, unknown user");
         }
 
@@ -399,7 +405,7 @@ public class IssueController
         Issue issue = issueOpt.get();
         if (watchingIssues.contains(issue))
         {
-            throw new HttpClientErrorException(HttpStatus.NOT_ACCEPTABLE,
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,
                 "Already watching this issue.");
         }
 
@@ -413,13 +419,14 @@ public class IssueController
 
     @DeleteMapping("/{id}/watch")
     @ApiOperation("Unwatch an issue")
-    Issue unwatchIssue(@PathVariable Long id, @RequestHeader(value="api_key", defaultValue="-1") String api_key)
+    Issue unwatchIssue(@PathVariable Long id,
+        @RequestHeader(value = "api_key", defaultValue = "-1") String api_key)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
 
         if (!issueOpt.isPresent())
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "Couldn't find issue with the specified id");
         }
 
@@ -427,7 +434,7 @@ public class IssueController
 
         if (!userOpt.isPresent())
         {
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED,
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                 "Action not available, unknown user");
         }
 
@@ -437,7 +444,7 @@ public class IssueController
         Issue issue = issueOpt.get();
         if (!watchingIssues.contains(issue))
         {
-            throw new HttpClientErrorException(HttpStatus.NOT_ACCEPTABLE,
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,
                 "Cannot unwatch this issue due to is not even watched");
         }
 
@@ -459,7 +466,7 @@ public class IssueController
             Issue issue = issueOpt.get();
             if (!issue.getUserCreator().equals(userRepository.findByToken(token).get()))
             {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Can't add attachments to a issue you didn't create");
             }
             for (MultipartFile file : files)
@@ -476,7 +483,7 @@ public class IssueController
         }
         else
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "Couldn't find a issue with the specified id");
         }
     }
@@ -492,7 +499,7 @@ public class IssueController
         }
         else
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "Couldn't find a issue with the specified id");
         }
 
@@ -509,12 +516,13 @@ public class IssueController
         }
         else
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "Couldn't find a issue with the specified id");
         }
     }
 
     @DeleteMapping("{id}/attachments/{fileId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     Set<UploadedFile> deleteAttachment(@PathVariable Long id, @PathVariable Long fileId,
         @RequestHeader("api_key") String token)
     {
@@ -527,7 +535,7 @@ public class IssueController
         }
         else
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "Couldn't find a issue with the specified id");
         }
 

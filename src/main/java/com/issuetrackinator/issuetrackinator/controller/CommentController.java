@@ -17,8 +17,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.issuetrackinator.issuetrackinator.model.Comment;
@@ -58,12 +59,13 @@ public class CommentController
         {
             return issueOpt.get().getComments();
         }
-        throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
             "Couldn't find issue with the specified id");
 
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     Comment createComment(@PathVariable Long id, @Valid @RequestBody CommentDto commentDto)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
@@ -81,7 +83,7 @@ public class CommentController
             issueRepository.save(issue);
             return comment;
         }
-        throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
             "Couldn't find issue with the specified id");
     }
 
@@ -95,7 +97,7 @@ public class CommentController
             Issue issue = issueOpt.get();
             List<Comment> comments = issue.getComments();
             Comment commentOld = comments.stream().filter(comm -> comm.getId().equals(commId))
-                .findFirst().orElseThrow(() -> new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                .findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Couldn't find comment with the specified id"));
             if (commentOld.getUserComment().getUsername()
                 .equals(userRepository.findByToken(token).get().getUsername()))
@@ -110,15 +112,16 @@ public class CommentController
             }
             else
             {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "You can't edit a comment that it's not from your user");
             }
         }
-        throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
             "Couldn't find issue with the specified id");
     }
 
     @DeleteMapping("/{comm-id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteComment(@PathVariable Long id, @PathVariable(name = "comm-id") Long commId,
         @RequestHeader("api_key") String token)
     {
@@ -128,7 +131,7 @@ public class CommentController
             Issue issue = issueOpt.get();
             List<Comment> comments = issue.getComments();
             Comment commentOld = comments.stream().filter(comm -> comm.getId().equals(commId))
-                .findFirst().orElseThrow(() -> new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                .findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Couldn't find comment with the specified id"));
             if (commentOld.getUserComment().getUsername()
                 .equals(userRepository.findByToken(token).get().getUsername()))
@@ -141,11 +144,11 @@ public class CommentController
             }
             else
             {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "You can't delete a comment that it's not from your user");
             }
         }
-        throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
             "Couldn't find issue with the specified id");
     }
 

@@ -1,25 +1,37 @@
 package com.issuetrackinator.issuetrackinator.controller;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.google.common.hash.Hashing;
-import com.issuetrackinator.issuetrackinator.model.NewUserDTO;
-import com.issuetrackinator.issuetrackinator.model.User;
-import com.issuetrackinator.issuetrackinator.model.UserCredentialsDTO;
-import com.issuetrackinator.issuetrackinator.repository.UserRepository;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
-
-import javax.validation.Valid;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.common.hash.Hashing;
+import com.issuetrackinator.issuetrackinator.model.NewUserDTO;
+import com.issuetrackinator.issuetrackinator.model.User;
+import com.issuetrackinator.issuetrackinator.model.UserCredentialsDTO;
+import com.issuetrackinator.issuetrackinator.repository.UserRepository;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 @Api(tags = "User controller")
 @RestController
@@ -64,37 +76,38 @@ public class UserController
             }
             else
             {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Can't get user info of another user that it's not yours");
             }
         }
-        throw new HttpClientErrorException(HttpStatus.FORBIDDEN,
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
             "Couldn't find a user with the specified id");
     }
 
     @PostMapping
     @ApiOperation("Create a new user")
+    @ResponseStatus(HttpStatus.CREATED)
     User createUser(@Valid @RequestBody NewUserDTO userDTO)
     {
         Pattern pattern = Pattern.compile(emailRegex);
         Matcher matcher = pattern.matcher(userDTO.getEmail());
         if (!matcher.matches())
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "The email is not valid");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The email is not valid");
         }
         if (userRepository.findByUsername(userDTO.getUsername()).isPresent())
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "The username is already taken");
         }
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent())
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "The email is already in use");
         }
         // Creating an instance of User with the content of the DTO
         User user = new User(userDTO.getUsername(), userDTO.getPersonalName(), userDTO.getEmail(),
-                             userDTO.getPassword());
+            userDTO.getPassword());
         user.setPassword(
             Hashing.sha256().hashString(user.getPassword(), StandardCharsets.UTF_8).toString());
         user.setToken(
@@ -110,24 +123,24 @@ public class UserController
         Optional<User> userOpt = userRepository.findById(id);
         if (!userOpt.isPresent())
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "This user doesn't exist");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This user doesn't exist");
         }
         Pattern pattern = Pattern.compile(emailRegex);
         Matcher matcher = pattern.matcher(newUser.getEmail());
         if (!matcher.matches())
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "The email is not valid");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The email is not valid");
         }
         if (!newUser.getUsername().equals(userOpt.get().getUsername())
             && userRepository.findByUsername(newUser.getUsername()).isPresent())
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "The username is already taken");
         }
         if (!newUser.getEmail().equalsIgnoreCase(userOpt.get().getEmail())
             && userRepository.findByEmail(newUser.getEmail()).isPresent())
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "The email is already in use");
         }
         User user = userOpt.get();
@@ -144,6 +157,7 @@ public class UserController
 
     @DeleteMapping("/{id}")
     @ApiOperation("Delete a user")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteUserById(@PathVariable final Long id, @RequestHeader("api_key") String token)
     {
         if (userRepository.findByToken(token).get().equals(userRepository.findById(id).get()))
@@ -152,7 +166,7 @@ public class UserController
         }
         else
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "Can't delete a user that it's not yours");
         }
 
@@ -167,7 +181,7 @@ public class UserController
             credKey = credentials.getUsername();
             if (credentials.getPassword() == null)
             {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Password is necessary");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is necessary");
             }
             Optional<User> userOpt = userRepository.findByUsername(credKey);
             if (userOpt.isPresent() && userOpt.get().getPassword().equals(Hashing.sha256()
@@ -177,7 +191,7 @@ public class UserController
             }
             else
             {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Credentials are not correct");
             }
         }
@@ -186,7 +200,7 @@ public class UserController
             credKey = credentials.getEmail();
             if (credentials.getPassword() == null)
             {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Password is necessary");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is necessary");
             }
             Optional<User> userOpt = userRepository.findByEmail(credKey);
             if (userOpt.isPresent() && userOpt.get().getPassword().equals(Hashing.sha256()
@@ -196,13 +210,13 @@ public class UserController
             }
             else
             {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Credentials are not correct");
             }
         }
         else
         {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "Email or username is necessary");
         }
 
