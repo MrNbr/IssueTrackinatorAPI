@@ -163,7 +163,7 @@ public class IssueController
         if (api_key != null){
             userOpt = userRepository.findByToken(api_key);
         }
-        
+
         if (!userOpt.isPresent() && (filter.toUpperCase().equals("MINE")
             || filter.toUpperCase().equals("WATCHING")))
         {
@@ -219,7 +219,7 @@ public class IssueController
 
     // just to change description, priority, title and type. Status has its own path
     @PutMapping("/{id}")
-    Issue editIssue(@PathVariable Long id, @Valid @RequestBody IssueDto issueDto,
+    Issue editIssue(@PathVariable Long id, @Valid @RequestBody NewIssueDTO issueDto,
         @RequestHeader("api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
@@ -233,7 +233,7 @@ public class IssueController
                 issue.setDescription(issueDto.getDescription());
                 issue.setPriority(issueDto.getPriority());
                 issue.setTitle(issueDto.getTitle());
-                issue.setUserAssignee(userRepository.findById(issueDto.getUserAssignee()).get());
+                issue.setUserAssignee(userRepository.findById(issueDto.getUserAssigneeId()).get());
                 issue.setType(issueDto.getType());
                 issueRepository.save(issue);
                 return issue;

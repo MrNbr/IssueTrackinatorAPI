@@ -144,7 +144,6 @@ public class UserController
 
     @DeleteMapping("/{id}")
     @ApiOperation("Delete a user")
-    void deleteUserById(@PathVariable final Long id)
     void deleteUserById(@PathVariable final Long id, @RequestHeader("api_key") String token)
     {
         if (userRepository.findByToken(token).get().equals(userRepository.findById(id).get()))
