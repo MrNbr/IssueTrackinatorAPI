@@ -153,7 +153,6 @@ public class IssueController
         @RequestParam(required = false, defaultValue = "id", value = "sort") String sort,
         @RequestParam(required = false, defaultValue = "DESC", value = "order") String order,
         @RequestParam(required = false, defaultValue = "id", value = "value") String value,
-        /* @RequestParam(required = false, defaultValue = "0", value="page") String page, */
         @RequestHeader(required = false, value = "api_key") String api_key)
     {
 
@@ -216,8 +215,8 @@ public class IssueController
         return issueRepository.save(issue);
     }
 
-    // just to change description, priority, title and type. Status has its own path
     @PutMapping("/{id}")
+    @ApiOperation("Edit an issue")
     Issue editIssue(@PathVariable Long id, @Valid @RequestBody NewIssueDTO issueDto,
         @RequestHeader("api_key") String token)
     {
@@ -251,6 +250,7 @@ public class IssueController
     }
 
     @PutMapping("/{id}/status")
+    @ApiOperation("Change an issue status")
     Issue editIssueStatus(@PathVariable Long id, @Valid @RequestBody String status,
         @RequestHeader("api_key") String token)
     {
@@ -427,6 +427,7 @@ public class IssueController
     }
 
     @PutMapping("{id}/attachments")
+    @ApiOperation("Add attachments to an issue")
     Issue addAttachments(@PathVariable Long id, @RequestHeader("api_key") String token,
         @RequestParam("files") MultipartFile[] files) throws IOException
     {
@@ -459,6 +460,7 @@ public class IssueController
     }
 
     @GetMapping("{id}/attachments")
+    @ApiOperation("Get all the attachments of an issue")
     Set<UploadedFile> getAttachments(@PathVariable Long id, @RequestHeader("api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
@@ -476,6 +478,7 @@ public class IssueController
     }
 
     @GetMapping("{id}/attachments/{fileId}")
+    @ApiOperation("Get a concrete attachment of an issue")
     byte[] getSingleAttachment(@PathVariable Long id, @PathVariable Long fileId,
         @RequestHeader("api_key") String token)
     {
@@ -492,6 +495,7 @@ public class IssueController
     }
 
     @DeleteMapping("{id}/attachments/{fileId}")
+    @ApiOperation("Delete a concrete attachment of an issue")
     Set<UploadedFile> deleteAttachment(@PathVariable Long id, @PathVariable Long fileId,
         @RequestHeader("api_key") String token)
     {
