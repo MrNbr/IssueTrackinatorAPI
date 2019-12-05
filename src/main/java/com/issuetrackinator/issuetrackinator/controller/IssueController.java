@@ -433,7 +433,7 @@ public class IssueController
     }
 
     @PutMapping("{id}/attachments")
-    @ApiOperation("Add attachments to an issue")
+    @ApiOperation(value = "Add attachments to an issue", tags = "Attachments")
     Issue addAttachments(@PathVariable Long id, @RequestHeader("api_key") String token,
         @RequestParam("files") MultipartFile[] files) throws IOException
     {
@@ -466,7 +466,7 @@ public class IssueController
     }
 
     @GetMapping("{id}/attachments")
-    @ApiOperation("Get all the attachments of an issue")
+    @ApiOperation(value = "Get all the attachments of an issue", tags = "Attachments")
     Set<UploadedFile> getAttachments(@PathVariable Long id, @RequestHeader("api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
@@ -484,7 +484,7 @@ public class IssueController
     }
 
     @GetMapping("{id}/attachments/{fileId}")
-    @ApiOperation("Get a concrete attachment of an issue")
+    @ApiOperation(value = "Get a concrete attachment of an issue", tags = "Attachments")
     byte[] getSingleAttachment(@PathVariable Long id, @PathVariable Long fileId,
         @RequestHeader("api_key") String token)
     {
@@ -501,7 +501,7 @@ public class IssueController
     }
 
     @DeleteMapping("{id}/attachments/{fileId}")
-    @ApiOperation("Delete a concrete attachment of an issue")
+    @ApiOperation(value = "Delete a concrete attachment of an issue", tags = "Attachments")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     Set<UploadedFile> deleteAttachment(@PathVariable Long id, @PathVariable Long fileId,
         @RequestHeader("api_key") String token)
