@@ -1,3 +1,8 @@
+#Token 732801532d297168eee3b5b70098e5ecb021dfadb7c470921233de58041f446d
+#Id user 1 (users from 1 to 6)
+#Id issues 1 to 8
+#password demouserasw
+#STATUS NEW, OPEN, RESOLVED, ON_HOLD, DUPLICATE, INVALID, WONTFIX, CLOSED
 swagger: '2.0'
 info:
   description: Swagger documentation to test our issue tracker API.
@@ -15,7 +20,7 @@ tags:
   - name: User controller
     description: Operations of the user controller
 schemes:
-  - http
+  - https
 consumes:
   - application/json
 produces:
@@ -130,7 +135,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
         - name: id
           in: path
@@ -190,7 +195,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
         - name: id
           in: path
@@ -224,7 +229,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
         - name: files
           in: formData
@@ -265,7 +270,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
         - name: fileId
           in: path
@@ -302,7 +307,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
         - name: fileId
           in: path
@@ -398,7 +403,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
         - name: comm-id
           in: path
@@ -442,7 +447,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
         - name: comm-id
           in: path
@@ -475,7 +480,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
         - name: id
           in: path
@@ -514,7 +519,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
         - name: id
           in: path
@@ -546,7 +551,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
         - name: id
           in: path
@@ -577,7 +582,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
           default: '-1'
         - name: id
@@ -610,7 +615,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
           default: '-1'
         - name: id
@@ -642,7 +647,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
       responses:
         '200':
@@ -692,7 +697,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
         - name: id
           in: path
@@ -722,7 +727,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
         - name: id
           in: path
@@ -760,7 +765,7 @@ paths:
         - name: api_key
           in: header
           description: api_key
-          required: true
+          required: false
           type: string
         - name: id
           in: path
@@ -801,9 +806,6 @@ definitions:
   CommentDTO:
     type: object
     properties:
-      idUser:
-        type: integer
-        format: int64
       text:
         type: string
         example: This issue is alright!
@@ -893,9 +895,6 @@ definitions:
           - MINOR
           - CRITICAL
           - BLOCKER
-      userCreatorId:
-        type: integer
-        format: int64
       userAssigneeId:
         type: integer
         format: int64
