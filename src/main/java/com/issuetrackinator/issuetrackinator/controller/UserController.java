@@ -158,8 +158,9 @@ public class UserController
 
     }
 
-    @GetMapping("/regenerateToken")
-    String regenerateToken(@RequestBody UserCredentialsDTO credentials)
+    @GetMapping("/token")
+    @ApiOperation(value = "Get the token of the user with the passed credentials", hidden = true)
+    String getToken(@RequestBody UserCredentialsDTO credentials)
     {
         String credKey;
         if (credentials.getUsername() != null)
