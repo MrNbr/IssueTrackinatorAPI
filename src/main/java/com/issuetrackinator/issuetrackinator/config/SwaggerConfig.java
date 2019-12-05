@@ -35,7 +35,8 @@ public class SwaggerConfig {
                 .apiInfo(getApiInfo())
                 .tags(new Tag("User controller", "Operations of the user controller"),
                         new Tag("Issue controller", "Operations of the issue controller"),
-                        new Tag("Comment controller", "Operations of the comment controller"));
+                        new Tag("Comment controller", "Operations of the comment controller"),
+                        new Tag("Attachments", "Operations related to issue attachments"));
     }
 
     private ApiInfo getApiInfo() {

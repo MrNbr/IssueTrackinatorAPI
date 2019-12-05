@@ -200,22 +200,20 @@ public class IssueController
     @ResponseStatus(HttpStatus.CREATED)
     Issue createNewIssue(@Valid @RequestBody NewIssueDTO issueDto)
     {
-        Date date = new Date();
-        Issue issue = new Issue();
-        issue.setCreationDate(date);
-        issue.setUpdateDate(date);
-        issue.setVotes(0);
-        issue.setDescription(issueDto.getDescription());
-        issue.setPriority(issueDto.getPriority());
-        issue.setStatus(IssueStatus.NEW);
-        issue.setTitle(issueDto.getTitle());
-        issue.setType(issueDto.getType());
-        issue.setUserCreator(userRepository.findById(issueDto.getUserCreatorId()).get());
-        if (issueDto.getUserAssigneeId() != null)
-        {
-            issue.setUserAssignee(userRepository.findById(issueDto.getUserAssigneeId()).get());
+        if(!userRepository.existsById(issueDto.getUserCreatorId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user creator doesn't exist");
         }
-        return issueRepository.save(issue);
+        if(!userRepository.existsById(issueDto.getUserAssigneeId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user assignee doesn't exist");
+        }
+        User userCreator = userRepository.getOne(issueDto.getUserCreatorId());
+        User userAssignee = userRepository.getOne(issueDto.getUserAssigneeId());
+
+        Issue issue = new Issue(issueDto.getTitle(), issueDto.getDescription(), issueDto.getType(),
+                issueDto.getPriority(), userCreator, userAssignee);
+
+        issueRepository.save(issue);
+        return issue;
     }
 
     @PutMapping("/{id}")
@@ -433,7 +431,7 @@ public class IssueController
     }
 
     @PutMapping("{id}/attachments")
-    @ApiOperation("Add attachments to an issue")
+    @ApiOperation(value = "Add attachments to an issue", consumes = "multipart/form-data", tags = "Attachments")
     Issue addAttachments(@PathVariable Long id, @RequestHeader("api_key") String token,
         @RequestParam("files") MultipartFile[] files) throws IOException
     {
@@ -466,7 +464,7 @@ public class IssueController
     }
 
     @GetMapping("{id}/attachments")
-    @ApiOperation("Get all the attachments of an issue")
+    @ApiOperation(value = "Get all the attachments of an issue", tags = "Attachments")
     Set<UploadedFile> getAttachments(@PathVariable Long id, @RequestHeader("api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
@@ -484,7 +482,7 @@ public class IssueController
     }
 
     @GetMapping("{id}/attachments/{fileId}")
-    @ApiOperation("Get a concrete attachment of an issue")
+    @ApiOperation(value = "Get a concrete attachment of an issue", tags = "Attachments")
     byte[] getSingleAttachment(@PathVariable Long id, @PathVariable Long fileId,
         @RequestHeader("api_key") String token)
     {
@@ -501,7 +499,7 @@ public class IssueController
     }
 
     @DeleteMapping("{id}/attachments/{fileId}")
-    @ApiOperation("Delete a concrete attachment of an issue")
+    @ApiOperation(value = "Delete a concrete attachment of an issue", tags = "Attachments")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     Set<UploadedFile> deleteAttachment(@PathVariable Long id, @PathVariable Long fileId,
         @RequestHeader("api_key") String token)

@@ -79,6 +79,20 @@ public class Issue
     private Date updateDate;
 
 
+    public Issue(String title, String description, IssueType type, IssuePriority priority, User userCreator, User userAssignee) {
+        this.title = title;
+        this.description = description;
+        this.type = type;
+        this.priority = priority;
+        this.status = IssueStatus.NEW;
+        this.votes = 0;
+        this.userCreator = userCreator;
+        this.userAssignee = userAssignee;
+        Date date = new Date();
+        this.creationDate = date;
+        this.updateDate = date;
+    }
+
     public Long getId() {
         return id;
     }
