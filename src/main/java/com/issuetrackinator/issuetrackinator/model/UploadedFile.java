@@ -7,6 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 public class UploadedFile
@@ -14,54 +15,50 @@ public class UploadedFile
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ApiModelProperty(position = 0)
     Long id;
+
+    @ApiModelProperty(position = 1)
+    private String name;
+
+    @ApiModelProperty(position = 2)
+    private String contentType;
 
     @JsonIgnore
     @Lob
-    byte[] file;
+    @ApiModelProperty(position = 3)
+    private byte[] file;
 
-    String contentType;
 
-    String name;
-
-    public Long getId()
-    {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Long id)
-    {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public byte[] getFile()
-    {
-        return file;
-    }
-
-    public void setFile(byte[] file)
-    {
-        this.file = file;
-    }
-
-    public String getContentType()
-    {
-        return contentType;
-    }
-
-    public void setContentType(String contentType)
-    {
-        this.contentType = contentType;
-    }
-
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public byte[] getFile() {
+        return file;
+    }
+
+    public void setFile(byte[] file) {
+        this.file = file;
+    }
 }
