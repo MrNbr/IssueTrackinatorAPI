@@ -433,7 +433,7 @@ public class IssueController
     }
 
     @PutMapping("{id}/attachments")
-    @ApiOperation(value = "Add attachments to an issue", tags = "Attachments")
+    @ApiOperation(value = "Add attachments to an issue", consumes = "multipart/form-data", tags = "Attachments")
     Issue addAttachments(@PathVariable Long id, @RequestHeader("api_key") String token,
         @RequestParam("files") MultipartFile[] files) throws IOException
     {
