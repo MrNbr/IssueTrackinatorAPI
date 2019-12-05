@@ -66,7 +66,8 @@ public class CommentController
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    Comment createComment(@PathVariable Long id, @Valid @RequestBody CommentDto commentDto)
+    Comment createComment(@PathVariable Long id, @Valid @RequestBody CommentDto commentDto,
+        @RequestHeader(required = false, value = "api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())
@@ -75,7 +76,7 @@ public class CommentController
             List<Comment> comments = issue.getComments();
             Comment comment = new Comment();
             comment.setText(commentDto.getText());
-            comment.setUserComment(userRepository.findById(commentDto.getIdUser()).get());
+            comment.setUserComment(userRepository.findByToken(token).get());
             comment.setCreationDate(new Date());
             comment = commentRepository.save(comment);
             comments.add(comment);
@@ -89,7 +90,8 @@ public class CommentController
 
     @PutMapping("/{comm-id}")
     Comment editComment(@PathVariable Long id, @PathVariable(name = "comm-id") Long commId,
-        @RequestBody CommentDto commentDto, @RequestHeader("api_key") String token)
+        @RequestBody CommentDto commentDto,
+        @RequestHeader(required = false, value = "api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())
@@ -123,7 +125,7 @@ public class CommentController
     @DeleteMapping("/{comm-id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteComment(@PathVariable Long id, @PathVariable(name = "comm-id") Long commId,
-        @RequestHeader("api_key") String token)
+        @RequestHeader(required = false, value = "api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())

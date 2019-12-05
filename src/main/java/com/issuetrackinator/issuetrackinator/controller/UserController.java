@@ -49,7 +49,7 @@ public class UserController
 
     @GetMapping
     @ApiOperation("Get all the users")
-    List<User> getUsers(@RequestHeader("api_key") String token)
+    List<User> getUsers(@RequestHeader(required = false, value = "api_key") String token)
     {
         List<User> users = userRepository.findAll();
         User userRequest = userRepository.findByToken(token).get();
@@ -65,7 +65,8 @@ public class UserController
 
     @GetMapping("{id}")
     @ApiOperation("Get a user by the id")
-    User getUserById(@PathVariable final Long id, @RequestHeader("api_key") String token)
+    User getUserById(@PathVariable final Long id,
+        @RequestHeader(required = false, value = "api_key") String token)
     {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent())
@@ -117,8 +118,8 @@ public class UserController
     }
 
     @PutMapping("/{id}")
-    User editUser(@RequestHeader("api_key") String token, @PathVariable final Long id,
-        @RequestBody User newUser)
+    User editUser(@RequestHeader(required = false, value = "api_key") String token,
+        @PathVariable final Long id, @RequestBody User newUser)
     {
         Optional<User> userOpt = userRepository.findById(id);
         if (!userOpt.isPresent())
@@ -158,7 +159,8 @@ public class UserController
     @DeleteMapping("/{id}")
     @ApiOperation("Delete a user")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void deleteUserById(@PathVariable final Long id, @RequestHeader("api_key") String token)
+    void deleteUserById(@PathVariable final Long id,
+        @RequestHeader(required = false, value = "api_key") String token)
     {
         if (userRepository.findByToken(token).get().equals(userRepository.findById(id).get()))
         {

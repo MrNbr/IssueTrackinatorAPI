@@ -247,7 +247,7 @@ public class IssueController
     // just to change description, priority, title and type. Status has its own path
     @PutMapping("/{id}")
     Issue editIssue(@PathVariable Long id, @Valid @RequestBody NewIssueDTO issueDto,
-        @RequestHeader("api_key") String token)
+        @RequestHeader(required = false, value = "api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())
@@ -280,7 +280,7 @@ public class IssueController
 
     @PutMapping("/{id}/status")
     Issue editIssueStatus(@PathVariable Long id, @Valid @RequestBody String status,
-        @RequestHeader("api_key") String token)
+        @RequestHeader(required = false, value = "api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())
@@ -331,7 +331,8 @@ public class IssueController
 
     @PostMapping("/{id}/vote")
     @ApiOperation("Upvote an issue")
-    Issue upvoteIssue(@PathVariable Long id, @RequestHeader("api_key") String token)
+    Issue upvoteIssue(@PathVariable Long id,
+        @RequestHeader(required = false, value = "api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())
@@ -356,7 +357,8 @@ public class IssueController
 
     @DeleteMapping("/{id}/vote")
     @ApiOperation("Unvote an issue")
-    Issue unvoteIssue(@PathVariable Long id, @RequestHeader("api_key") String token)
+    Issue unvoteIssue(@PathVariable Long id,
+        @RequestHeader(required = false, value = "api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())
@@ -382,7 +384,7 @@ public class IssueController
     @PostMapping("/{id}/watch")
     @ApiOperation("Set an issue as watched")
     Issue watchIssue(@PathVariable Long id,
-        @RequestHeader(value = "api_key", defaultValue = "-1") String api_key)
+        @RequestHeader(required = false, value = "api_key") String api_key)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
 
@@ -421,7 +423,7 @@ public class IssueController
     @DeleteMapping("/{id}/watch")
     @ApiOperation("Unwatch an issue")
     Issue unwatchIssue(@PathVariable Long id,
-        @RequestHeader(value = "api_key", defaultValue = "-1") String api_key)
+        @RequestHeader(required = false, value = "api_key") String api_key)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
 
@@ -458,7 +460,8 @@ public class IssueController
     }
 
     @PutMapping("{id}/attachments")
-    Issue addAttachments(@PathVariable Long id, @RequestHeader("api_key") String token,
+    Issue addAttachments(@PathVariable Long id,
+        @RequestHeader(required = false, value = "api_key") String token,
         @RequestParam("files") MultipartFile[] files) throws IOException
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
@@ -490,7 +493,8 @@ public class IssueController
     }
 
     @GetMapping("{id}/attachments")
-    Set<UploadedFile> getAttachments(@PathVariable Long id, @RequestHeader("api_key") String token)
+    Set<UploadedFile> getAttachments(@PathVariable Long id,
+        @RequestHeader(required = false, value = "api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())
@@ -508,7 +512,7 @@ public class IssueController
 
     @GetMapping("{id}/attachments/{fileId}")
     byte[] getSingleAttachment(@PathVariable Long id, @PathVariable Long fileId,
-        @RequestHeader("api_key") String token)
+        @RequestHeader(required = false, value = "api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())
@@ -525,7 +529,7 @@ public class IssueController
     @DeleteMapping("{id}/attachments/{fileId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     Set<UploadedFile> deleteAttachment(@PathVariable Long id, @PathVariable Long fileId,
-        @RequestHeader("api_key") String token)
+        @RequestHeader(required = false, value = "api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())
