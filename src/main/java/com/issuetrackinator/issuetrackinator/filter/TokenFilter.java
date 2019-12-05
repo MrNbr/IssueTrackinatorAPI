@@ -27,11 +27,6 @@ public class TokenFilter implements Filter
     @Autowired
     UserRepository userRepository;
 
-    public TokenFilter()
-    {
-
-    }
-
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException
@@ -43,10 +38,8 @@ public class TokenFilter implements Filter
         String requestURI = httpRequest.getRequestURI();
 
         if (requestMethod.equals("POST") && requestURI.contains("/api/users")
-            || requestMethod.equals("GET") && (requestURI.contains("/api/issues")
-                || requestMethod.equals("GET") && requestURI.contains("/api/users/regenerateToken")
-                || requestURI.contains("api-docs") || requestURI.contains("swagger")
-                || requestURI.contains("webjars")))
+            || requestMethod.equals("GET") && requestURI.contains("/api/issues")
+            || requestMethod.equals("GET") && requestURI.contains("/api/users/regenerateToken"))
         {
             chain.doFilter(request, response);
         }

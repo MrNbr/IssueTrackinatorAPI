@@ -223,7 +223,8 @@ public class IssueController
     @PostMapping
     @ApiOperation("Create a new issue")
     @ResponseStatus(HttpStatus.CREATED)
-    Issue createNewIssue(@Valid @RequestBody NewIssueDTO issueDto)
+    Issue createNewIssue(@Valid @RequestBody NewIssueDTO issueDto,
+        @RequestHeader(required = false, value = "api_key") String token)
     {
         Date date = new Date();
         Issue issue = new Issue();
@@ -235,7 +236,7 @@ public class IssueController
         issue.setStatus(IssueStatus.NEW);
         issue.setTitle(issueDto.getTitle());
         issue.setType(issueDto.getType());
-        issue.setUserCreator(userRepository.findById(issueDto.getUserCreatorId()).get());
+        issue.setUserCreator(userRepository.findByToken(token).get());
         if (issueDto.getUserAssigneeId() != null)
         {
             issue.setUserAssignee(userRepository.findById(issueDto.getUserAssigneeId()).get());

@@ -18,11 +18,7 @@ public class NewIssueDTO
     private IssuePriority priority;
 
     @ApiModelProperty(position = 4)
-    private Long userCreatorId;
-
-    @ApiModelProperty(position = 5)
     private Long userAssigneeId;
-
 
     public String getTitle()
     {
@@ -62,16 +58,6 @@ public class NewIssueDTO
     public void setPriority(IssuePriority priority)
     {
         this.priority = priority;
-    }
-
-    public Long getUserCreatorId()
-    {
-        return userCreatorId;
-    }
-
-    public void setUserCreatorId(Long userCreatorId)
-    {
-        this.userCreatorId = userCreatorId;
     }
 
     public Long getUserAssigneeId()
