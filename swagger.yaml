@@ -1,0 +1,964 @@
+swagger: '2.0'
+info:
+  description: Swagger documentation to test our issue tracker API.
+  version: 1.0.0
+  title: Issue Trackinator API
+host: 'apiissuetrackinator.herokuapp.com'
+basePath: /
+tags:
+  - name: Attachments
+    description: Operations related to issue attachments
+  - name: Comment controller
+    description: Operations of the comment controller
+  - name: Issue controller
+    description: Operations of the issue controller
+  - name: User controller
+    description: Operations of the user controller
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /api/issues:
+    get:
+      tags:
+        - Issue controller
+      summary: Get all the issues with the specified filter
+      operationId: getAllIssuesUsingGET
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: false
+          type: string
+        - name: filter
+          in: query
+          description: filter
+          required: false
+          type: string
+          default: all
+        - name: order
+          in: query
+          description: order
+          required: false
+          type: string
+          default: DESC
+        - name: sort
+          in: query
+          description: sort
+          required: false
+          type: string
+          default: id
+        - name: value
+          in: query
+          description: value
+          required: false
+          type: string
+          default: id
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Issue'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+    post:
+      tags:
+        - Issue controller
+      summary: Create a new issue
+      operationId: createNewIssueUsingPOST
+      parameters:
+        - in: body
+          name: issueDto
+          description: issueDto
+          required: true
+          schema:
+            $ref: '#/definitions/NewIssueDTO'
+      responses:
+        '201':
+          description: Created
+          schema:
+            $ref: '#/definitions/Issue'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+        - ApiKeySchema: []
+  '/api/issues/{id}':
+    get:
+      tags:
+        - Issue controller
+      summary: Get an issue by the id
+      operationId: getIssueByIdUsingGET
+      parameters:
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Issue'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+        - ApiKeySchema: []
+    put:
+      tags:
+        - Issue controller
+      summary: Edit an issue
+      operationId: editIssueUsingPUT
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+        - in: body
+          name: issueDto
+          description: issueDto
+          required: true
+          schema:
+            $ref: '#/definitions/NewIssueDTO'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Issue'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+        - ApiKeySchema: []
+    delete:
+      tags:
+        - Issue controller
+      summary: Delete an issue
+      operationId: deleteIssueByIdUsingDELETE
+      parameters:
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      security:
+        - ApiKeySchema: []
+  '/api/issues/{id}/attachments':
+    get:
+      tags:
+        - Attachments
+      summary: Get all the attachments of an issue
+      operationId: getAttachmentsUsingGET
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UploadedFile'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+        - ApiKeySchema: []
+    put:
+      tags:
+        - Attachments
+      summary: Add attachments to an issue
+      operationId: addAttachmentsUsingPUT
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+        - name: files
+          in: formData
+          description: files
+          required: true
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Issue'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+        - ApiKeySchema: []
+  '/api/issues/{id}/attachments/{fileId}':
+    get:
+      tags:
+        - Attachments
+      summary: Get a concrete attachment of an issue
+      operationId: getSingleAttachmentUsingGET
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+        - name: fileId
+          in: path
+          description: fileId
+          required: true
+          type: integer
+          format: int64
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+            format: byte
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+        - ApiKeySchema: []
+    delete:
+      tags:
+        - Attachments
+      summary: Delete a concrete attachment of an issue
+      operationId: deleteAttachmentUsingDELETE
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+        - name: fileId
+          in: path
+          description: fileId
+          required: true
+          type: integer
+          format: int64
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: No Content
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UploadedFile'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      security:
+        - ApiKeySchema: []
+  '/api/issues/{id}/comments':
+    get:
+      tags:
+        - Comment controller
+      summary: Get all the comments of an issue
+      operationId: getCommentsUsingGET
+      parameters:
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Comment'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+        - ApiKeySchema: []
+    post:
+      tags:
+        - Comment controller
+      summary: Create a new comment in a issue
+      operationId: createCommentUsingPOST
+      parameters:
+        - in: body
+          name: commentDto
+          description: commentDto
+          required: true
+          schema:
+            $ref: '#/definitions/CommentDTO'
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '201':
+          description: Created
+          schema:
+            $ref: '#/definitions/Comment'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+        - ApiKeySchema: []
+  '/api/issues/{id}/comments/{comm-id}':
+    put:
+      tags:
+        - Comment controller
+      summary: Edit a comment of an issue
+      operationId: editCommentUsingPUT
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+        - name: comm-id
+          in: path
+          description: comm-id
+          required: true
+          type: integer
+          format: int64
+        - in: body
+          name: commentDto
+          description: commentDto
+          required: true
+          schema:
+            $ref: '#/definitions/CommentDTO'
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Comment'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+        - ApiKeySchema: []
+    delete:
+      tags:
+        - Comment controller
+      summary: Delete a comment of an issue
+      operationId: deleteCommentUsingDELETE
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+        - name: comm-id
+          in: path
+          description: comm-id
+          required: true
+          type: integer
+          format: int64
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      security:
+        - ApiKeySchema: []
+  '/api/issues/{id}/status':
+    put:
+      tags:
+        - Issue controller
+      summary: Change an issue status
+      operationId: editIssueStatusUsingPUT
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+        - in: body
+          name: status
+          description: status
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Issue'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+        - ApiKeySchema: []
+  '/api/issues/{id}/vote':
+    post:
+      tags:
+        - Issue controller
+      summary: Upvote an issue
+      operationId: upvoteIssueUsingPOST
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Issue'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+        - ApiKeySchema: []
+    delete:
+      tags:
+        - Issue controller
+      summary: Unvote an issue
+      operationId: unvoteIssueUsingDELETE
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Issue'
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      security:
+        - ApiKeySchema: []
+  '/api/issues/{id}/watch':
+    post:
+      tags:
+        - Issue controller
+      summary: Set an issue as watched
+      operationId: watchIssueUsingPOST
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+          default: '-1'
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Issue'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+        - ApiKeySchema: []
+    delete:
+      tags:
+        - Issue controller
+      summary: Unwatch an issue
+      operationId: unwatchIssueUsingDELETE
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+          default: '-1'
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Issue'
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      security:
+        - ApiKeySchema: []
+  /api/users:
+    get:
+      tags:
+        - User controller
+      summary: Get all the users
+      operationId: getUsersUsingGET
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+        - ApiKeySchema: []
+    post:
+      tags:
+        - User controller
+      summary: Create a new user
+      operationId: createUserUsingPOST
+      parameters:
+        - in: body
+          name: userDTO
+          description: userDTO
+          required: true
+          schema:
+            $ref: '#/definitions/NewUserDTO'
+      responses:
+        '201':
+          description: Created
+          schema:
+            $ref: '#/definitions/User'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  '/api/users/{id}':
+    get:
+      tags:
+        - User controller
+      summary: Get a user by the id
+      operationId: getUserByIdUsingGET
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+        - ApiKeySchema: []
+    put:
+      tags:
+        - User controller
+      summary: editUser
+      operationId: editUserUsingPUT
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+        - in: body
+          name: newUser
+          description: newUser
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      security:
+        - ApiKeySchema: []
+    delete:
+      tags:
+        - User controller
+      summary: Delete a user
+      operationId: deleteUserByIdUsingDELETE
+      parameters:
+        - name: api_key
+          in: header
+          description: api_key
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      security:
+        - ApiKeySchema: []
+securityDefinitions:
+  ApiKeySchema:
+    type: apiKey
+    name: api_key
+    in: header
+definitions:
+  Comment:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      text:
+        type: string
+        example: This issue is alright!
+      userComment:
+        $ref: '#/definitions/User'
+      creationDate:
+        type: string
+        format: date-time
+    title: Comment
+  CommentDTO:
+    type: object
+    properties:
+      idUser:
+        type: integer
+        format: int64
+      text:
+        type: string
+        example: This issue is alright!
+    title: CommentDTO
+  Issue:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      title:
+        type: string
+        example: A new issue
+      description:
+        type: string
+        example: This is the description of the new issue
+      type:
+        type: string
+        example: TASK
+        enum:
+          - BUG
+          - ENHANCEMENT
+          - PROPOSAL
+          - TASK
+      priority:
+        type: string
+        example: TRIVIAL
+        enum:
+          - MAJOR
+          - TRIVIAL
+          - MINOR
+          - CRITICAL
+          - BLOCKER
+      status:
+        type: string
+        example: NEW
+        enum:
+          - NEW
+          - OPEN
+          - RESOLVED
+          - ON_HOLD
+          - DUPLICATE
+          - INVALID
+          - WONTFIX
+          - CLOSED
+      votes:
+        type: integer
+        format: int32
+      userCreator:
+        $ref: '#/definitions/User'
+      userAssignee:
+        $ref: '#/definitions/User'
+      comments:
+        type: array
+        items:
+          $ref: '#/definitions/Comment'
+      creationDate:
+        type: string
+        format: date-time
+      updateDate:
+        type: string
+        format: date-time
+    title: Issue
+  NewIssueDTO:
+    type: object
+    properties:
+      title:
+        type: string
+        example: A new issue
+      description:
+        type: string
+        example: This is the description of the new issue
+      type:
+        type: string
+        example: TASK
+        enum:
+          - BUG
+          - ENHANCEMENT
+          - PROPOSAL
+          - TASK
+      priority:
+        type: string
+        example: TRIVIAL
+        enum:
+          - MAJOR
+          - TRIVIAL
+          - MINOR
+          - CRITICAL
+          - BLOCKER
+      userCreatorId:
+        type: integer
+        format: int64
+      userAssigneeId:
+        type: integer
+        format: int64
+    title: NewIssueDTO
+  NewUserDTO:
+    type: object
+    properties:
+      username:
+        type: string
+        example: tom
+      personalName:
+        type: string
+        example: Tom Bombadil
+      email:
+        type: string
+        example: email@provider.com
+      password:
+        type: string
+        example: password123
+    title: NewUserDTO
+  UploadedFile:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      contentType:
+        type: string
+    title: UploadedFile
+  User:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      username:
+        type: string
+        example: tom
+      personalName:
+        type: string
+        example: Tom Bombadil
+      email:
+        type: string
+        example: email@provider.com
+      password:
+        type: string
+        example: password123
+      token:
+        type: string
+        example: 6afd6dd40f7ff2d557743da155c3629608391f819cd86c6c93d0596a033e45a6
+    title: User
+  UserCredentialsDTO:
+    type: object
+    properties:
+      username:
+        type: string
+        example: tom
+      email:
+        type: string
+        example: email@provider.com
+      password:
+        type: string
+        example: password123
+    title: UserCredentialsDTO
