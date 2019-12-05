@@ -42,6 +42,7 @@ public class TokenFilter implements Filter
             || requestMethod.equals("GET") && requestURI.contains("/api/users/regenerateToken"))
         {
             chain.doFilter(request, response);
+            return;
         }
         else
         {
@@ -68,6 +69,7 @@ public class TokenFilter implements Filter
             if (!headerFound)
             {
                 ((HttpServletResponse) response).sendError(400, "There's no token in the header");
+                return;
             }
 
         }
