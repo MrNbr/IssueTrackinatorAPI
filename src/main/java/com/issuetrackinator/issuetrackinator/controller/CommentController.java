@@ -22,7 +22,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.issuetrackinator.issuetrackinator.model.Comment;
-import com.issuetrackinator.issuetrackinator.model.CommentDto;
+import com.issuetrackinator.issuetrackinator.model.CommentDTO;
 import com.issuetrackinator.issuetrackinator.model.Issue;
 import com.issuetrackinator.issuetrackinator.repository.CommentRepository;
 import com.issuetrackinator.issuetrackinator.repository.IssueRepository;
@@ -64,7 +64,7 @@ public class CommentController
     }
 
     @PostMapping
-    Comment createComment(@PathVariable Long id, @Valid @RequestBody CommentDto commentDto)
+    Comment createComment(@PathVariable Long id, @Valid @RequestBody CommentDTO commentDto)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())
@@ -87,7 +87,7 @@ public class CommentController
 
     @PutMapping("/{comm-id}")
     Comment editComment(@PathVariable Long id, @PathVariable(name = "comm-id") Long commId,
-        @RequestBody CommentDto commentDto, @RequestHeader("api_key") String token)
+                        @RequestBody CommentDTO commentDto, @RequestHeader("api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())
