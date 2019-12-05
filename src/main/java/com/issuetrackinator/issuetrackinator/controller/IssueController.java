@@ -200,22 +200,20 @@ public class IssueController
     @ResponseStatus(HttpStatus.CREATED)
     Issue createNewIssue(@Valid @RequestBody NewIssueDTO issueDto)
     {
-        Date date = new Date();
-        Issue issue = new Issue();
-        issue.setCreationDate(date);
-        issue.setUpdateDate(date);
-        issue.setVotes(0);
-        issue.setDescription(issueDto.getDescription());
-        issue.setPriority(issueDto.getPriority());
-        issue.setStatus(IssueStatus.NEW);
-        issue.setTitle(issueDto.getTitle());
-        issue.setType(issueDto.getType());
-        issue.setUserCreator(userRepository.findById(issueDto.getUserCreatorId()).get());
-        if (issueDto.getUserAssigneeId() != null)
-        {
-            issue.setUserAssignee(userRepository.findById(issueDto.getUserAssigneeId()).get());
+        if(!userRepository.existsById(issueDto.getUserCreatorId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user creator doesn't exist");
         }
-        return issueRepository.save(issue);
+        if(!userRepository.existsById(issueDto.getUserAssigneeId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user assignee doesn't exist");
+        }
+        User userCreator = userRepository.getOne(issueDto.getUserCreatorId());
+        User userAssignee = userRepository.getOne(issueDto.getUserAssigneeId());
+
+        Issue issue = new Issue(issueDto.getTitle(), issueDto.getDescription(), issueDto.getType(),
+                issueDto.getPriority(), userCreator, userAssignee);
+
+        issueRepository.save(issue);
+        return issue;
     }
 
     @PutMapping("/{id}")
