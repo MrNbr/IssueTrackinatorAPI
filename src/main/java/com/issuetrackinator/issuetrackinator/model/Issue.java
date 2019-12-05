@@ -58,22 +58,24 @@ public class Issue
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "idUserAssignee")
     private User userAssignee;
-  
+
+    @ApiModelProperty(position = 10)
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "comments", joinColumns = @JoinColumn(name = "issueId"), inverseJoinColumns = @JoinColumn(name = "commentId"))
-    List<Comment> comments;
+    private List<Comment> comments;
 
     @JsonIgnore
+    @ApiModelProperty(position = 11)
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "attachments")
-    Set<UploadedFile> attachments;
+    private Set<UploadedFile> attachments;
 
     @NotNull
-    @ApiModelProperty(position = 10)
+    @ApiModelProperty(position = 12)
     private Date creationDate;
 
     @NotNull
-    @ApiModelProperty(position = 11)
+    @ApiModelProperty(position = 13)
     private Date updateDate;
 
 

@@ -1,41 +1,29 @@
 package com.issuetrackinator.issuetrackinator.controller;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.issuetrackinator.issuetrackinator.model.Comment;
-import com.issuetrackinator.issuetrackinator.model.CommentDto;
+import com.issuetrackinator.issuetrackinator.model.CommentDTO;
 import com.issuetrackinator.issuetrackinator.model.Issue;
 import com.issuetrackinator.issuetrackinator.repository.CommentRepository;
 import com.issuetrackinator.issuetrackinator.repository.IssueRepository;
 import com.issuetrackinator.issuetrackinator.repository.UserRepository;
-
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-@Api(tags = "Comments controller")
-@CrossOrigin
-@JsonIgnoreProperties("hibernateLazyInitializer")
+import javax.validation.Valid;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+@Api(tags = "Comment controller")
 @RestController
+@CrossOrigin
 @RequestMapping("/api" + CommentController.ISSUE_PATH + "/{id}" + CommentController.COMMENTS_PATH)
+@JsonIgnoreProperties("hibernateLazyInitializer")
 public class CommentController
 {
     final static String ISSUE_PATH = "/issues";
@@ -52,6 +40,7 @@ public class CommentController
     CommentRepository commentRepository;
 
     @GetMapping
+    @ApiOperation("Get all the comments of an issue")
     List<Comment> getComments(@PathVariable Long id)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
@@ -66,7 +55,8 @@ public class CommentController
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    Comment createComment(@PathVariable Long id, @Valid @RequestBody CommentDto commentDto)
+    @ApiOperation("Create a new comment in a issue")
+    Comment createComment(@PathVariable Long id, @Valid @RequestBody CommentDTO commentDto)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())
@@ -88,8 +78,9 @@ public class CommentController
     }
 
     @PutMapping("/{comm-id}")
+    @ApiOperation("Edit a comment of an issue")
     Comment editComment(@PathVariable Long id, @PathVariable(name = "comm-id") Long commId,
-        @RequestBody CommentDto commentDto, @RequestHeader("api_key") String token)
+                        @RequestBody CommentDTO commentDto, @RequestHeader("api_key") String token)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
         if (issueOpt.isPresent())
@@ -122,6 +113,7 @@ public class CommentController
 
     @DeleteMapping("/{comm-id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiOperation("Delete a comment of an issue")
     void deleteComment(@PathVariable Long id, @PathVariable(name = "comm-id") Long commId,
         @RequestHeader("api_key") String token)
     {

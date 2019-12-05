@@ -50,7 +50,7 @@ public class User
     @ApiModelProperty(position = 6)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "watchers", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "issueId"))
-    Set<Issue> watchingIssues;
+    private Set<Issue> watchingIssues;
 
 
     public User() { }
