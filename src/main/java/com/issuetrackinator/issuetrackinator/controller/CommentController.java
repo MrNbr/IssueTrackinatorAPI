@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -30,11 +31,11 @@ import com.issuetrackinator.issuetrackinator.repository.UserRepository;
 
 import io.swagger.annotations.Api;
 
-@Api(tags = "Comments controller")
-@CrossOrigin
-@JsonIgnoreProperties("hibernateLazyInitializer")
+@Api(tags = "Comment controller")
 @RestController
+@CrossOrigin
 @RequestMapping("/api" + CommentController.ISSUE_PATH + "/{id}" + CommentController.COMMENTS_PATH)
+@JsonIgnoreProperties("hibernateLazyInitializer")
 public class CommentController
 {
     final static String ISSUE_PATH = "/issues";
@@ -51,6 +52,7 @@ public class CommentController
     CommentRepository commentRepository;
 
     @GetMapping
+    @ApiOperation("Get all the comments of an issue")
     List<Comment> getComments(@PathVariable Long id)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
@@ -64,6 +66,7 @@ public class CommentController
     }
 
     @PostMapping
+    @ApiOperation("Create a new comment in a issue")
     Comment createComment(@PathVariable Long id, @Valid @RequestBody CommentDTO commentDto)
     {
         Optional<Issue> issueOpt = issueRepository.findById(id);
@@ -86,6 +89,7 @@ public class CommentController
     }
 
     @PutMapping("/{comm-id}")
+    @ApiOperation("Edit a comment of an issue")
     Comment editComment(@PathVariable Long id, @PathVariable(name = "comm-id") Long commId,
                         @RequestBody CommentDTO commentDto, @RequestHeader("api_key") String token)
     {
@@ -119,6 +123,7 @@ public class CommentController
     }
 
     @DeleteMapping("/{comm-id}")
+    @ApiOperation("Delete a comment of an issue")
     void deleteComment(@PathVariable Long id, @PathVariable(name = "comm-id") Long commId,
         @RequestHeader("api_key") String token)
     {
