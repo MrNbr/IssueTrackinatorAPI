@@ -15,7 +15,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.text.SimpleDateFormat;
 import java.io.IOException;
 import java.util.*;
 
@@ -425,105 +424,6 @@ public class IssueController
         userRepository.save(user);
 
         return issue;
-    }
-
-    @GetMapping("/{id}/comments")
-    List<Comment> getComments(@PathVariable Long id)
-    {
-        Optional<Issue> issueOpt = issueRepository.findById(id);
-        if (issueOpt.isPresent())
-        {
-            return issueOpt.get().getComments();
-        }
-        throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-            "Couldn't find issue with the specified id");
-
-    }
-
-    @PostMapping("/{id}/comments")
-    Comment createComment(@PathVariable Long id, @Valid @RequestBody CommentDto commentDto)
-    {
-        Optional<Issue> issueOpt = issueRepository.findById(id);
-        if (issueOpt.isPresent())
-        {
-            Issue issue = issueOpt.get();
-            List<Comment> comments = issue.getComments();
-            Comment comment = new Comment();
-            comment.setText(commentDto.getText());
-            comment.setUserComment(userRepository.findById(commentDto.getIdUser()).get());
-            comment.setCreationDate(new Date());
-            comment = commentRepository.save(comment);
-            comments.add(comment);
-            issue.setComments(comments);
-            issueRepository.save(issue);
-            return comment;
-        }
-        throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-            "Couldn't find issue with the specified id");
-    }
-
-    @PutMapping("/{id}/comments/{comm-id}")
-    Comment editComment(@PathVariable Long id, @PathVariable(name = "comm-id") Long commId,
-        @RequestBody CommentDto commentDto, @RequestHeader("api_key") String token)
-    {
-        Optional<Issue> issueOpt = issueRepository.findById(id);
-        if (issueOpt.isPresent())
-        {
-            Issue issue = issueOpt.get();
-            List<Comment> comments = issue.getComments();
-            Comment commentOld = comments.stream().filter(comm -> comm.getId().equals(commId))
-                .findFirst().orElseThrow(() -> new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Couldn't find comment with the specified id"));
-            if (commentOld.getUserComment().getUsername()
-                .equals(userRepository.findByToken(token).get().getUsername()))
-            {
-                comments.remove(commentOld);
-                commentOld.setText(commentDto.getText());
-                commentOld.setCreationDate(new Date());
-                comments.add(commentOld);
-                issue.setComments(comments);
-                issueRepository.save(issue);
-                return commentOld;
-            }
-            else
-            {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "You can't edit a comment that it's not from your user");
-            }
-        }
-        throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-            "Couldn't find issue with the specified id");
-    }
-
-    @DeleteMapping("/{id}/comments/{comm-id}")
-    void deleteComment(@PathVariable Long id, @PathVariable(name = "comm-id") Long commId,
-        @RequestHeader("api_key") String token)
-    {
-        Optional<Issue> issueOpt = issueRepository.findById(id);
-        if (issueOpt.isPresent())
-        {
-            Issue issue = issueOpt.get();
-            List<Comment> comments = issue.getComments();
-            Comment commentOld = comments.stream().filter(comm -> comm.getId().equals(commId))
-                .findFirst().orElseThrow(() -> new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Couldn't find comment with the specified id"));
-            if (commentOld.getUserComment().getUsername()
-                .equals(userRepository.findByToken(token).get().getUsername()))
-            {
-                commentRepository.delete(commentOld);
-                comments.remove(commentOld);
-                issue.setComments(comments);
-                issueRepository.save(issue);
-                return;
-            }
-            else
-            {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "You can't delete a comment that it's not from your user");
-            }
-        }
-        throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-            "Couldn't find issue with the specified id");
     }
 
     @PutMapping("{id}/attachments")
