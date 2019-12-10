@@ -1,15 +1,27 @@
 package com.issuetrackinator.issuetrackinator.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.swagger.annotations.ApiModelProperty;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @JsonIgnoreProperties("hibernateLazyInitializer")
@@ -78,8 +90,13 @@ public class Issue
     @ApiModelProperty(position = 13)
     private Date updateDate;
 
+    public Issue()
+    {
+    }
 
-    public Issue(String title, String description, IssueType type, IssuePriority priority, User userCreator, User userAssignee) {
+    public Issue(String title, String description, IssueType type, IssuePriority priority,
+        User userCreator, User userAssignee)
+    {
         this.title = title;
         this.description = description;
         this.type = type;
@@ -93,99 +110,123 @@ public class Issue
         this.updateDate = date;
     }
 
-    public Long getId() {
+    public Long getId()
+    {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Long id)
+    {
         this.id = id;
     }
 
-    public String getTitle() {
+    public String getTitle()
+    {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(String title)
+    {
         this.title = title;
     }
 
-    public String getDescription() {
+    public String getDescription()
+    {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(String description)
+    {
         this.description = description;
     }
 
-    public IssueType getType() {
+    public IssueType getType()
+    {
         return type;
     }
 
-    public void setType(IssueType type) {
+    public void setType(IssueType type)
+    {
         this.type = type;
     }
 
-    public IssuePriority getPriority() {
+    public IssuePriority getPriority()
+    {
         return priority;
     }
 
-    public void setPriority(IssuePriority priority) {
+    public void setPriority(IssuePriority priority)
+    {
         this.priority = priority;
     }
 
-    public IssueStatus getStatus() {
+    public IssueStatus getStatus()
+    {
         return status;
     }
 
-    public void setStatus(IssueStatus status) {
+    public void setStatus(IssueStatus status)
+    {
         this.status = status;
     }
 
-    public int getVotes() {
+    public int getVotes()
+    {
         return votes;
     }
 
-    public void setVotes(int votes) {
+    public void setVotes(int votes)
+    {
         this.votes = votes;
     }
 
-    public Set<User> getVotesUsers() {
+    public Set<User> getVotesUsers()
+    {
         return votesUsers;
     }
 
-    public void setVotesUsers(Set<User> votesUsers) {
+    public void setVotesUsers(Set<User> votesUsers)
+    {
         this.votesUsers = votesUsers;
     }
 
-    public User getUserCreator() {
+    public User getUserCreator()
+    {
         return userCreator;
     }
 
-    public void setUserCreator(User userCreator) {
+    public void setUserCreator(User userCreator)
+    {
         this.userCreator = userCreator;
     }
 
-    public User getUserAssignee() {
+    public User getUserAssignee()
+    {
         return userAssignee;
     }
 
-    public void setUserAssignee(User userAssignee) {
+    public void setUserAssignee(User userAssignee)
+    {
         this.userAssignee = userAssignee;
     }
 
-    public Date getCreationDate() {
+    public Date getCreationDate()
+    {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(Date creationDate)
+    {
         this.creationDate = creationDate;
     }
 
-    public Date getUpdateDate() {
+    public Date getUpdateDate()
+    {
         return updateDate;
     }
 
-    public void setUpdateDate(Date updateDate) {
+    public void setUpdateDate(Date updateDate)
+    {
         this.updateDate = updateDate;
     }
 

@@ -1,22 +1,46 @@
 package com.issuetrackinator.issuetrackinator.controller;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.issuetrackinator.issuetrackinator.model.*;
+import com.issuetrackinator.issuetrackinator.model.Comment;
+import com.issuetrackinator.issuetrackinator.model.Issue;
+import com.issuetrackinator.issuetrackinator.model.IssueStatus;
+import com.issuetrackinator.issuetrackinator.model.NewIssueDTO;
+import com.issuetrackinator.issuetrackinator.model.UploadedFile;
+import com.issuetrackinator.issuetrackinator.model.User;
 import com.issuetrackinator.issuetrackinator.repository.CommentRepository;
 import com.issuetrackinator.issuetrackinator.repository.IssueRepository;
 import com.issuetrackinator.issuetrackinator.repository.UploadedFileRepository;
 import com.issuetrackinator.issuetrackinator.repository.UserRepository;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
-
-import javax.validation.Valid;
-import java.io.IOException;
-import java.util.*;
 
 @Api(tags = "Issue controller")
 @RestController
@@ -198,19 +222,24 @@ public class IssueController
     @PostMapping
     @ApiOperation("Create a new issue")
     @ResponseStatus(HttpStatus.CREATED)
-    Issue createNewIssue(@Valid @RequestBody NewIssueDTO issueDto)
+    Issue createNewIssue(@Valid @RequestBody NewIssueDTO issueDto,
+        @RequestHeader("api_key") String token)
     {
-        if(!userRepository.existsById(issueDto.getUserCreatorId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user creator doesn't exist");
+        if (!userRepository.findByToken(token).isPresent())
+        {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "The user creator doesn't exist");
         }
-        if(!userRepository.existsById(issueDto.getUserAssigneeId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user assignee doesn't exist");
+        if (!userRepository.existsById(issueDto.getUserAssigneeId()))
+        {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "The user assignee doesn't exist");
         }
-        User userCreator = userRepository.getOne(issueDto.getUserCreatorId());
+        User userCreator = userRepository.findByToken(token).get();
         User userAssignee = userRepository.getOne(issueDto.getUserAssigneeId());
 
         Issue issue = new Issue(issueDto.getTitle(), issueDto.getDescription(), issueDto.getType(),
-                issueDto.getPriority(), userCreator, userAssignee);
+            issueDto.getPriority(), userCreator, userAssignee);
 
         issueRepository.save(issue);
         return issue;
